@@ -1,110 +1,170 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
-
-{% block title %}{% if query %}"{{ query }}" — Explore Egypt{% else %}Explore Egypt{% endif %}{% endblock %}
-{% block meta_desc %}Discover the best landmarks, museums, and temples across Egypt.{% endblock %}
+{% block title %}Explore{% endblock %}
 {% block body_class %}page-explore{% endblock %}
-
+{% block nav_explore %}active{% endblock %}
+{% block nav_hotels %}{% if request.GET.type == 'hotel' %}active{% endif %}{% endblock %}
+{% block nav_restaurants %}{% if request.GET.type == 'restaurant' %}active{% endif %}{% endblock %}
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'places/explore.css' %}" />
+  <link rel="stylesheet" href="{% static 'places/explore.css' %}" />
 {% endblock %}
 
 {% block content %}
-<section class="explore-header">
-  <div class="eh-inner">
-    <nav class="dh-breadcrumb" aria-label="Breadcrumb">
-      <a href="{% url 'pages' %}">Home</a>
-      <i class="fas fa-chevron-right"></i>
-      <span>Explore</span>
-      {% if query %}<i class="fas fa-chevron-right"></i><span>"{{ query }}"</span>{% endif %}
-    </nav>
 
-    <div class="eh-title-row">
-      <div>
-        <span class="eyebrow">{% if query %}Search Results{% else %}All Places{% endif %}</span>
-        <h1 class="eh-title">{% if query %}Results for "{{ query }}"{% else %}Explore Egypt{% endif %}</h1>
-        <p class="eh-sub">{{ total_count }} place{{ total_count|pluralize }} found</p>
-      </div>
-
-      <form class="eh-search" action="{% url 'explore' %}" method="get" role="search">
-        <div class="eh-search-field">
-          <i class="fas fa-magnifying-glass"></i>
-          <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search pyramids, temples, Nile cruises…" autocomplete="off" aria-label="Search places" />
-          {% if query %}<a href="{% url 'explore' %}" class="eh-clear" aria-label="Clear search"><i class="fas fa-xmark"></i></a>{% endif %}
-        </div>
-        <button type="submit" class="eh-search-btn">Search</button>
-      </form>
-    </div>
+<section class="explore-hero reveal">
+  <div class="container">
+    {% if request.GET.type == 'hotel' %}
+      <h1>Royal Chambers — Hotels of Egypt</h1>
+    {% elif request.GET.type == 'restaurant' %}
+      <h1>The Banquet Hall — Restaurants</h1>
+    {% else %}
+      <h1>Explore Egypt — All Destinations</h1>
+    {% endif %}
   </div>
 </section>
 
-<section class="places-section">
-  <div class="ps-inner">
-    {% if places %}
-    <div class="places-grid" id="placesGrid">
-      {% for place in places %}
-      <a href="{% if place.slug %}{% url 'place' place.slug %}{% else %}#{% endif %}" class="place-card reveal-up" style="--rd:{{ forloop.counter0 }}00ms">
-        <div class="pc-img-wrap">
-          {% with place.images.first as img %}
-          <div class="pc-img {% if not img %}pc-img--placeholder{% endif %}"{% if img %} style="background-image:url('{{ img.image.url }}')"{% endif %}></div>
-          {% endwith %}
+<section class="explore-filters" id="search-panel">
+  <div class="container filters-layout">
 
-          {% with svc=place.bookableservice %}
-          {% if svc.rating or svc.price %}
-          <div class="card-hover-meta">
-            {% if svc.rating %}<i class="fas fa-star"></i><span>{{ svc.rating }}</span>{% endif %}
-            {% if svc.price %}<i class="fas fa-tag"></i><span>{{ svc.price }}</span>{% endif %}
-          </div>
-          {% endif %}
-          {% endwith %}
-        </div>
+    <form method="GET" action="{% url 'explore' %}" class="search-form">
+      {% if request.GET.type %}
+        <input type="hidden" name="type" value="{{ request.GET.type }}" />
+      {% endif %}
+      <label for="explore-q" class="sr-only">Search Places</label>
+     <input
+      id="explore-q"
+      type="text"
+      name="q"
+      value="{{ request.GET.q|default:'' }}"
+      placeholder="Search landmarks, hotels, restaurants"
+    />
+      <button type="submit">𓂀 Search</button>
+    </form>
 
-        <div class="pc-info">
-          <h3 class="pc-name">{{ place.name }}</h3>
-          {% if place.discrption %}<p class="pc-name-ar">{{ place.discrption|truncatechars:64 }}</p>{% endif %}
-          <div class="pc-meta">
-            <span class="pc-loc"><i class="fas fa-location-dot"></i> Egypt</span>
-            {% if place.bookableservice.rating %}<span class="pc-rating"><i class="fas fa-star"></i> {{ place.bookableservice.rating }}</span>{% endif %}
-          </div>
-          <span class="pc-cta">View Details <i class="fas fa-arrow-right"></i></span>
-        </div>
-      </a>
-      {% endfor %}
+    <div class="filter-tabs" role="tablist" aria-label="Place type filter">
+      <a
+        href="{% url 'explore' %}{% if query %}?q={{ query }}{% endif %}"
+        class="filter-tab {% if not request.GET.type %}active{% endif %}"
+      >All</a>
+      <a
+        href="{% url 'explore' %}?type=landmark{% if query %}&q={{ query }}{% endif %}"
+        class="filter-tab {% if request.GET.type == 'landmark' %}active{% endif %}"
+      >𓆙 Landmarks</a>
+      <a
+        href="{% url 'explore' %}?type=hotel{% if query %}&q={{ query }}{% endif %}"
+        class="filter-tab {% if request.GET.type == 'hotel' %}active{% endif %}"
+      >𓉼 Hotels</a>
+      <a
+        href="{% url 'explore' %}?type=restaurant{% if query %}&q={{ query }}{% endif %}"
+        class="filter-tab {% if request.GET.type == 'restaurant' %}active{% endif %}"
+      >𓌉 Restaurants</a>
     </div>
 
-    {% if page_obj and page_obj.has_other_pages %}
-    <nav class="pagination" aria-label="Page navigation">
-      {% if page_obj.has_previous %}
-      <a href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.previous_page_number }}" class="pag-btn pag-btn--prev"><i class="fas fa-chevron-left"></i><span>Previous</span></a>
-      {% else %}
-      <span class="pag-btn pag-btn--prev pag-btn--disabled"><i class="fas fa-chevron-left"></i><span>Previous</span></span>
-      {% endif %}
+  </div>
+</section>
 
-      <div class="pag-numbers">
-        {% for num in page_obj.paginator.page_range %}
-        {% if page_obj.number == num %}
-        <span class="pag-num pag-num--active">{{ num }}</span>
-        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-        <a href="?{% if query %}q={{ query }}&{% endif %}page={{ num }}" class="pag-num">{{ num }}</a>
-        {% endif %}
+<section class="section explore-results">
+  <div class="container">
+
+    {# FIXED: default filter cannot take a variable as fallback #}
+    <p class="results-count reveal">
+      {% if total_count %}
+        {{ total_count }}
+      {% elif page_obj %}
+        {{ page_obj.paginator.count }}
+      {% else %}
+        0
+      {% endif %}
+      places found
+      {% if query %} for &ldquo;{{ query }}&rdquo;{% endif %}
+    </p>
+
+    {% if places %}
+      <div class="places-grid">
+        {% for place in places %}
+          <article class="place-card reveal">
+
+            <a
+              href="{% if place.slug %}{% url 'place' place.slug %}{% else %}{% url 'explore' %}{% endif %}"
+              class="place-card-media"
+            >
+              {% if place.image %}
+                <img src="{{ place.image.url }}" alt="{{ place.name|default:'—' }}" />
+              {% elif place.images.first %}
+                {% with card_image=place.images.first %}
+                  <img src="{{ card_image.image.url }}" alt="{{ place.name|default:'—' }}" />
+                {% endwith %}
+              {% endif %}
+
+              <span class="place-badge">
+                {% if request.GET.type %}
+                  {{ request.GET.type|title }}
+                {% elif place.category %}
+                  {{ place.category }}
+                {% elif place.type %}
+                  {{ place.type }}
+                {% else %}
+                  Destination
+                {% endif %}
+              </span>
+            </a>
+
+            <div class="place-card-content">
+              <h3>{{ place.name|default:'—' }}</h3>
+              {# FIXED: default filter cannot take a variable as fallback #}
+              <p class="place-rating">
+                ★
+                {% if place.rating %}
+                  {{ place.rating }}
+                {% else %}
+                  —
+                {% endif %}
+              </p>
+              <p class="place-location">{{ place.location|default:'—' }}</p>
+              <a
+                href="{% if place.slug %}{% url 'place' place.slug %}{% else %}{% url 'explore' %}{% endif %}"
+                class="place-link"
+              >Explore →</a>
+            </div>
+
+          </article>
         {% endfor %}
       </div>
-
-      {% if page_obj.has_next %}
-      <a href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.next_page_number }}" class="pag-btn pag-btn--next"><span>Next</span><i class="fas fa-chevron-right"></i></a>
-      {% else %}
-      <span class="pag-btn pag-btn--next pag-btn--disabled"><span>Next</span><i class="fas fa-chevron-right"></i></span>
-      {% endif %}
-    </nav>
-    {% endif %}
     {% else %}
-    <div class="explore-empty">
-      <div class="ee-icon"><i class="fas fa-compass"></i></div>
-      <h3 class="ee-title">No places found</h3>
-      <p class="ee-sub">{% if query %}No results for "<strong>{{ query }}</strong>". Try a different keyword.{% else %}No places yet. Check back soon.{% endif %}</p>
-      <a href="{% url 'explore' %}" class="btn btn-gold">Browse All Places</a>
-    </div>
+      <div class="empty-state reveal">
+        <p class="hiero-glyph">𓂀 𓆙 𓇯</p>
+        <h3>No places found</h3>
+        <p>The sands of time hold no results for your search.</p>
+        <a href="{% url 'explore' %}" class="btn-gold">Clear Search</a>
+      </div>
     {% endif %}
+
+    {% if page_obj and page_obj.has_other_pages %}
+      <nav class="pagination reveal" aria-label="Explore pagination">
+        {% if page_obj.has_previous %}
+          <a
+            href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}"
+            class="page-btn"
+          >← Prev</a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          <a
+            href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}"
+            class="page-btn {% if page_obj.number == num %}active{% endif %}"
+          >{{ num }}</a>
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <a
+            href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}"
+            class="page-btn"
+          >Next →</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+
   </div>
 </section>
-{% endblock content %}
+
+{% endblock %}

@@ -1,179 +1,80 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block title %}About Us — Egypt Tourism{% endblock %}
-{% block meta_desc %}Learn about our mission to share Egypt's timeless heritage with the world.{% endblock %}
-{% block og_title %}About Visit Egypt{% endblock %}
-{% block body_class %}page-about{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/about.css' %}" />
-{% endblock %}
-
+{% extends 'base.html' %} 
+{% block title %}About{% endblock %} 
+{% block body_class %}page-about{% endblock %} 
+{% block nav_about %}active{% endblock %}
 {% block content %}
-<section class="about-hero">
-  <div class="ah-bg {% if not hero_image %}ah-bg--fallback{% endif %}"{% if hero_image %} style="background-image:url('{{ hero_image.url }}')"{% endif %}></div>
-  <div class="ah-overlay"></div>
-  <div class="ah-inner">
-    <nav class="dh-breadcrumb" aria-label="Breadcrumb">
-      <a href="{% url 'pages' %}">Home</a>
-      <i class="fas fa-chevron-right"></i>
-      <span>About Us</span>
-    </nav>
-    <span class="ah-eyebrow reveal-anim" style="--d: 0.25s">Our Story</span>
-    <h1 class="ah-title reveal-anim" style="--d: 0.45s">About Us</h1>
-    <p class="ah-sub reveal-anim" style="--d: 0.65s">عن مصر</p>
-  </div>
-  <div class="ah-scroll-cue">
-    <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
-    <span>Scroll</span>
+<section class="about-hero reveal">
+  <div class="container">
+    <p class="hero-glyphs" aria-hidden="true">𓋹 𓂀 𓆙 𓇯</p>
+    <h1>The Story of Kemetly</h1>
+    <p>Born from a love for the eternal land of Egypt.</p>
   </div>
 </section>
 
-<section class="mv-section">
-  <div class="mv-inner">
-    <div class="mv-card reveal-up">
-      <div class="mv-icon-wrap"><i class="fas fa-bullseye"></i></div>
-      <h2 class="mv-label">Our Mission</h2>
-      <p class="mv-text">{{ mission }}</p>
-    </div>
-
-    <div class="mv-divider"></div>
-
-    <div class="mv-card reveal-up" style="--rd: 0.15s">
-      <div class="mv-icon-wrap"><i class="fas fa-eye"></i></div>
-      <h2 class="mv-label">Our Vision</h2>
-      <p class="mv-text">{{ vision }}</p>
-    </div>
-  </div>
-</section>
-
-<section class="story-section">
-  <div class="story-inner">
-    <div class="story-label-col">
-      <span class="eyebrow reveal-up">Who We Are</span>
-      <h2 class="sec-title reveal-up" style="--rd: 0.1s">Our Story</h2>
-      <div class="story-ornament reveal-up" style="--rd: 0.2s"><span></span><i class="fas fa-ankh"></i><span></span></div>
-    </div>
-
-    <div class="story-text-col reveal-up" style="--rd: 0.15s">
-      <div class="story-prose">{{ story|linebreaks }}</div>
-    </div>
-  </div>
-</section>
-
-<section class="values-section">
-  <div class="values-inner">
-    <div class="values-head">
-      <span class="eyebrow reveal-up">What Drives Us</span>
-      <h2 class="sec-title reveal-up" style="--rd: 0.1s">Our Core Values</h2>
-    </div>
-    <div class="values-grid">
-      {% for val in values %}
-      <div class="val-card reveal-up" style="--rd:{{ forloop.counter0 }}00ms">
-        <div class="val-icon"><i class="{{ val.icon }}"></i></div>
-        <h3 class="val-title">{{ val.title }}</h3>
-        <p class="val-desc">{{ val.description }}</p>
-      </div>
-      {% empty %}
-      <p class="empty-state">Values coming soon.</p>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-
-<section class="stats-band">
-  <div class="stats-inner">
-    {% for stat in stats %}
-    <div class="stat-block reveal-up" style="--rd:{{ forloop.counter0 }}00ms">
-      <i class="{{ stat.icon }} stat-ico"></i>
-      <div class="stat-data">
-        <div class="stat-num-wrap">
-          <span class="stat-num" data-target="{{ stat.number }}">0</span>
-          <span class="stat-suf">{{ stat.suffix }}</span>
-        </div>
-        <span class="stat-lbl">{{ stat.label }}</span>
+<section class="section about-mission">
+  <div class="container mission-layout">
+    <div class="mission-panel reveal">
+      <p class="mission-glyph" aria-hidden="true">𓋹 𓂀 𓆙 𓇯 𓏏</p>
+      <div class="hiero-divider">
+        <span class="hiero-line"></span>
+        <span class="hiero-glyph">𓂀 𓆙 𓇯</span>
+        <span class="hiero-line"></span>
       </div>
     </div>
-    {% if not forloop.last %}<div class="stat-sep"></div>{% endif %}
-    {% endfor %}
-  </div>
-</section>
 
-{% if milestones %}
-<section class="timeline-section">
-  <div class="timeline-inner">
-    <div class="timeline-head">
-      <span class="eyebrow reveal-up">Our Journey</span>
-      <h2 class="sec-title reveal-up" style="--rd: 0.1s">Key Milestones</h2>
-    </div>
-    <div class="timeline">
-      {% for ms in milestones %}
-      <div class="tl-item {% cycle 'tl-left' 'tl-right' %} reveal-up" style="--rd:{{ forloop.counter0 }}00ms">
-        <div class="tl-card">
-          <span class="tl-year">{{ ms.year }}</span>
-          <h3 class="tl-title">{{ ms.title }}</h3>
-          <p class="tl-desc">{{ ms.description }}</p>
-        </div>
-        <div class="tl-dot"></div>
+    <div class="mission-content reveal">
+      <h2>Our Mission</h2>
+      <div class="papyrus-box">
+        {{ about_mission|default:'Kemetly exists to connect curious travelers with the living legacy of Egypt through refined planning, meaningful experiences, and a modern travel journey rooted in timeless heritage.'|linebreaks }}
       </div>
-      {% endfor %}
-      <div class="tl-line"></div>
     </div>
   </div>
 </section>
-{% endif %}
 
-{% if show_team %}
-<section class="team-section" id="team">
-  <div class="team-inner">
-    <div class="team-head">
-      <span class="eyebrow reveal-up">The People Behind It</span>
-      <h2 class="sec-title reveal-up" style="--rd: 0.1s">Meet Our Team</h2>
-      <p class="sec-sub reveal-up" style="--rd: 0.2s">فريقنا المتميز</p>
-    </div>
+{% if team_members %}
+<section class="section about-team">
+  <div class="container">
+    <h2 class="section-title reveal">Guardians of the Journey</h2>
     <div class="team-grid">
       {% for member in team_members %}
-      <div class="team-card reveal-up" style="--rd:{{ forloop.counter0 }}00ms">
-        <div class="tc-img-wrap">
-          {% if member.image %}
-          <img class="tc-img" src="{{ member.image.url }}" alt="{{ member.name }}" loading="lazy" />
-          {% else %}
-          <div class="tc-img tc-img--placeholder"><i class="fas fa-user"></i></div>
-          {% endif %}
-
-          {% if member.social %}
-          <div class="tc-social">
-            {% if member.social.linkedin %}<a href="{{ member.social.linkedin }}" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>{% endif %}
-            {% if member.social.instagram %}<a href="{{ member.social.instagram }}" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>{% endif %}
-            {% if member.social.twitter %}<a href="{{ member.social.twitter }}" target="_blank" rel="noopener" aria-label="X"><i class="fab fa-x-twitter"></i></a>{% endif %}
-          </div>
-          {% endif %}
-        </div>
-        <div class="tc-info">
-          <h3 class="tc-name">{{ member.name }}</h3>
-          <span class="tc-role">{{ member.role }}</span>
-          {% if member.bio %}<p class="tc-bio">{{ member.bio|truncatechars:120 }}</p>{% endif %}
-        </div>
-      </div>
-      {% empty %}
-      <p class="empty-state">Team members coming soon.</p>
+      <article class="team-card reveal">
+        {% if member.photo %}
+        <img src="{{ member.photo.url }}" alt="{{ member.name|default:'—' }}" />
+        {% endif %}
+        <h4>{{ member.name|default:'—' }}</h4>
+        <p>{{ member.role|default:'—' }}</p>
+      </article>
       {% endfor %}
     </div>
   </div>
 </section>
 {% endif %}
 
-<section class="cta-band">
-  <div class="cta-inner">
-    <div class="reveal-up">
-      <span class="eyebrow" style="color: var(--gold)">Let's Explore Together</span>
-      <h2 class="sec-title sec-title-light">Ready to Discover Egypt?</h2>
-    </div>
-    <div class="cta-actions reveal-up" style="--rd: 0.2s">
-      <a href="{% url 'explore' %}" class="btn btn-gold">Start Exploring</a>
-      <a href="{% url 'book' %}" class="btn btn-outline-light">Book Now</a>
-    </div>
+<section class="section about-values">
+  <div class="container values-grid">
+    <article class="value-card reveal">
+      <p class="value-icon" aria-hidden="true">𓋹</p>
+      <h3>Heritage</h3>
+      <p>
+        {{ value_heritage|default:'Every itinerary honors Egypt&apos;s cultural memory and historical depth.' }}
+      </p>
+    </article>
+
+    <article class="value-card reveal">
+      <p class="value-icon" aria-hidden="true">𓎛</p>
+      <h3>Innovation</h3>
+      <p>
+        {{ value_innovation|default:'Modern planning tools support elegant travel decisions at every step.' }}
+      </p>
+    </article>
+
+    <article class="value-card reveal">
+      <p class="value-icon" aria-hidden="true">𓂀</p>
+      <h3>Experience</h3>
+      <p>
+        {{ value_experience|default:'Thoughtful hospitality transforms each destination into a timeless memory.' }}
+      </p>
+    </article>
   </div>
 </section>
-{% endblock content %}
+{% endblock %}

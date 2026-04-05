@@ -1,121 +1,210 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
-
-{% block title %}{{ place.name }} — Egypt{% endblock %}
-{% block meta_desc %}{{ place.discrption|default:''|truncatechars:160 }}{% endblock %}
-
-{% block og_title %}{{ place.name }} · Visit Egypt{% endblock %}
-{% block og_desc %}{{ place.discrption|default:''|truncatechars:120 }}{% endblock %}
-{% block og_image %}{% with place.images.first as hi %}{% if hi %}<meta property="og:image" content="{{ hi.image.url }}" />{% endif %}{% endwith %}{% endblock %}
-
+{% block title %}{{ place.name|default:'Place' }}{% endblock %}
 {% block body_class %}page-detail{% endblock %}
-
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'places/detail.css' %}" />
+  <link rel="stylesheet" href="{% static 'places/detail.css' %}" />
 {% endblock %}
 
 {% block content %}
-<section class="detail-hero">
-  {% with place.images.first as hero_img %}
-  <div class="dh-bg {% if not hero_img %}dh-bg--placeholder{% endif %}"{% if hero_img %} style="background-image:url('{{ hero_img.image.url }}')"{% endif %}></div>
-  {% endwith %}
-  <div class="dh-overlay"></div>
 
-  <div class="dh-inner">
-    <nav class="dh-breadcrumb" aria-label="Breadcrumb">
-      <a href="{% url 'pages' %}">Home</a>
-      <i class="fas fa-chevron-right"></i>
-      <a href="{% url 'explore' %}">Explore</a>
-      <i class="fas fa-chevron-right"></i>
-      <span>{{ place.name }}</span>
-    </nav>
-
-    <h1 class="dh-title reveal-anim" style="--d: 0.3s">{{ place.name }}</h1>
-
-    {% if service.rating or service.price %}
-    <div class="dh-meta reveal-anim" style="--d: 0.65s">
-      {% if service.rating %}<span class="dh-meta-item"><i class="fas fa-star"></i> {{ service.rating }}</span>{% endif %}
-      {% if service.price %}<span class="dh-meta-item"><i class="fas fa-tag"></i> {{ service.price }}</span>{% endif %}
-    </div>
+<section class="detail-hero reveal">
+  <div class="detail-hero-media" aria-hidden="true">
+    {% if place.image %}
+      <img
+        src="{{ place.image.url }}"
+        alt="{{ place.name|default:'—' }}"
+        class="detail-hero-img"
+      />
+    {% elif place.images.first %}
+      {% with hero_image=place.images.first %}
+        <img
+          src="{{ hero_image.image.url }}"
+          alt="{{ place.name|default:'—' }}"
+          class="detail-hero-img"
+        />
+      {% endwith %}
     {% endif %}
   </div>
 
-  <div class="scroll-cue dh-scroll">
-    <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
-    <span>Scroll</span>
+  <div class="detail-hero-overlay"></div>
+
+  <div class="container detail-hero-content">
+    <span class="place-badge">
+      {# FIXED: default filter cannot take a variable as fallback #}
+      {% if place.category %}
+        {{ place.category }}
+      {% elif place.type %}
+        {{ place.type }}
+      {% else %}
+        Destination
+      {% endif %}
+    </span>
+    <h1>{{ place.name|default:'—' }}</h1>
+    {# FIXED: default filter cannot take a variable as fallback #}
+    <p class="detail-rating">
+      ★
+      {% if service.rating %}
+        {{ service.rating }}
+      {% elif place.rating %}
+        {{ place.rating }}
+      {% else %}
+        —
+      {% endif %}
+      /5
+    </p>
   </div>
 </section>
 
-<div class="detail-body {% if show_booking %}detail-body--with-sidebar{% endif %}">
-  <article class="detail-main">
-    <section class="dm-section reveal-up">
-      <h2 class="dm-heading">About This Place</h2>
-      <div class="dm-prose">{{ place.discrption|default:''|linebreaks }}</div>
-    </section>
+<section class="section detail-main">
+  <div class="container detail-layout">
 
-    <section class="dm-section dm-gallery-section reveal-up" style="--rd: 0.1s">
-      <h2 class="dm-heading">Gallery</h2>
-      <div class="dm-gallery" id="dmGallery">
-        {% for img in place.images.all %}
-        <button class="dm-thumb {% if forloop.first %}dm-thumb--hero{% endif %}" data-index="{{ forloop.counter0 }}" data-src="{{ img.image.url }}" data-caption="{{ place.name }}" aria-label="View image {{ forloop.counter }}">
-          <img src="{{ img.image.url }}" alt="{{ place.name }}" loading="{% if forloop.first %}eager{% else %}lazy{% endif %}" />
-        </button>
-        {% empty %}
-        <div class="dm-no-images">
-          <i class="fas fa-image"></i>
-          <p>No images added yet.</p>
-        </div>
-        {% endfor %}
+    <div class="detail-primary reveal">
+      <h2>{{ place.name|default:'—' }}</h2>
+
+      <div class="detail-meta">
+        <span>𓏏 {{ place.location|default:'—' }}</span>
+        <span>
+          ⭐
+          {% if service.rating %}
+            {{ service.rating }}
+          {% elif place.rating %}
+            {{ place.rating }}
+          {% else %}
+            —
+          {% endif %}
+          /5
+        </span>
+        {# FIXED: default filter cannot take a variable as fallback #}
+        <span>
+          𓉱
+          {% if place.category %}
+            {{ place.category }}
+          {% elif place.type %}
+            {{ place.type }}
+          {% else %}
+            —
+          {% endif %}
+        </span>
       </div>
 
-      <div class="dm-lightbox" id="dmLightbox" aria-hidden="true" role="dialog" aria-modal="true">
-        <div class="dm-lb-overlay" id="dmLbOverlay"></div>
-        <div class="dm-lb-inner">
-          <img class="dm-lb-img" id="dmLbImg" src="" alt="" />
-          <p class="dm-lb-caption" id="dmLbCaption"></p>
-          <button class="dm-lb-close" id="dmLbClose" aria-label="Close"><i class="fas fa-xmark"></i></button>
-          <button class="dm-lb-prev" id="dmLbPrev" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
-          <button class="dm-lb-next" id="dmLbNext" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
-          <span class="dm-lb-counter" id="dmLbCounter"></span>
-        </div>
+      <div class="hiero-divider">
+        <span class="hiero-line"></span>
+        <span class="hiero-glyph">𓂀 𓆙 𓇯</span>
+        <span class="hiero-line"></span>
       </div>
-    </section>
+
+      {% if place.images.count > 1 %}
+        <div class="detail-gallery">
+          {% for img in place.images.all %}
+            <button
+              class="detail-gallery-thumb {% if forloop.first %}active{% endif %}"
+              data-detail-thumb="{{ img.image.url }}"
+              data-detail-alt="{{ place.name|default:'—' }}"
+            >
+              <img src="{{ img.image.url }}" alt="{{ place.name|default:'—' }}" />
+            </button>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {# FIXED: use a safe runtime fallback for the discrption text #}
+      <div class="papyrus-box">
+        {% if place.discrption %}
+          {{ place.discrption|linebreaks }}
+        {% else %}
+          —
+        {% endif %}
+      </div>
+
+      {% if place.opening_hours %}
+        <div class="info-block">
+          <h3>Opening Hours</h3>
+          {{ place.opening_hours|linebreaks }}
+        </div>
+      {% endif %}
+
+      {% if place.admission_info %}
+        <div class="info-block">
+          <h3>Admission</h3>
+          <p>{{ place.admission_info|default:'—' }}</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <aside class="detail-sidebar reveal">
+      {% include 'places/feature/booking_pricing.html' %}
+      <div class="map-placeholder">𓂀 Interactive Map Coming Soon</div>
+    </aside>
+
+  </div>
+</section>
+
+<section class="section related-places">
+  <div class="container">
+    <h2 class="section-title reveal">
+      More in {{ place.location|default:'Egypt' }}
+    </h2>
 
     {% if related %}
-    <section class="dm-section dm-related reveal-up" style="--rd: 0.2s">
-      <h2 class="dm-heading">You May Also Like</h2>
-      <div class="dm-related-grid">
-        {% for rp in related %}
-        <a href="{% if rp.slug %}{% url 'place' rp.slug %}{% else %}#{% endif %}" class="dm-rel-card">
-          {% with rp.images.first as ri %}
-          <div class="dm-rel-img"{% if ri %} style="background-image:url('{{ ri.image.url }}')"{% endif %}>
-            {% with rps=rp.bookableservice %}
-            {% if rps.rating or rps.price %}
-            <div class="card-hover-meta">
-              {% if rps.rating %}<i class="fas fa-star"></i><span>{{ rps.rating }}</span>{% endif %}
-              {% if rps.price %}<i class="fas fa-tag"></i><span>{{ rps.price }}</span>{% endif %}
+      <div class="related-grid">
+        {% for related_place in related %}
+          <article class="related-card reveal">
+
+            <a
+              href="{% if related_place.slug %}{% url 'place' related_place.slug %}{% else %}{% url 'explore' %}{% endif %}"
+              class="related-media"
+            >
+              {% if related_place.image %}
+                <img
+                  src="{{ related_place.image.url }}"
+                  alt="{{ related_place.name|default:'—' }}"
+                />
+              {% elif related_place.images.first %}
+                {% with related_image=related_place.images.first %}
+                  <img
+                    src="{{ related_image.image.url }}"
+                    alt="{{ related_place.name|default:'—' }}"
+                  />
+                {% endwith %}
+              {% endif %}
+            </a>
+
+            <div class="related-content">
+              <h3>{{ related_place.name|default:'—' }}</h3>
+              {# FIXED: default filter cannot take a variable as fallback #}
+              <p>
+                {% if related_place.type %}
+                  {{ related_place.type }}
+                {% elif related_place.category %}
+                  {{ related_place.category }}
+                {% else %}
+                  —
+                {% endif %}
+              </p>
+              <a
+                href="{% if related_place.slug %}{% url 'place' related_place.slug %}{% else %}{% url 'explore' %}{% endif %}"
+                class="place-link"
+              >Explore →</a>
             </div>
-            {% endif %}
-            {% endwith %}
-          </div>
-          {% endwith %}
-          <div class="dm-rel-info">
-            <h4 class="dm-rel-name">{{ rp.name }}</h4>
-            {% if rp.discrption %}<p class="dm-rel-name-ar">{{ rp.discrption|truncatechars:52 }}</p>{% endif %}
-          </div>
-        </a>
+
+          </article>
         {% endfor %}
       </div>
-    </section>
+    {% else %}
+      <div class="empty-state reveal">
+        <p class="hiero-glyph">𓂀 𓆙 𓇯</p>
+        <h3>No related places available</h3>
+        <p>Discover more destinations from the explore page.</p>
+        <a href="{% url 'explore' %}" class="btn-gold">Explore Places</a>
+      </div>
     {% endif %}
-  </article>
 
-  {% if show_booking %}
-  <aside class="detail-sidebar">{% include "places/feature/booking_priceing.html" with booking=booking place=place %}</aside>
-  {% endif %}
-</div>
-{% endblock content %}
+  </div>
+</section>
+
+{% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'places/detail.js' %}"></script>
+  <script src="{% static 'places/detail.js' %}"></script>
 {% endblock %}

@@ -15,7 +15,7 @@ def list_places(request):
         .order_by("name")
     )
     if query:
-        qs = qs.filter(Q(name__icontains=query) | Q(discrption__icontains=query))
+        qs = qs.filter(Q(name__icontains=query) | Q(description__icontains=query))
 
     paginator = Paginator(qs, 9)
     page_obj = paginator.get_page(request.GET.get("page"))

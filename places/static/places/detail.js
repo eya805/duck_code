@@ -1,95 +1,53 @@
-/* ══════════════════════════════════════════════════════
-  EGYPT DETAIL PAGE JS — places/static/places/detail.js
-  Handles: image gallery + lightbox
-  ══════════════════════════════════════════════════════ */
- 
+// Detail page enhancements for gallery and booking interactions.
 document.addEventListener('DOMContentLoaded', () => {
+	const heroImage = document.querySelector('.detail-hero-img');
+	const thumbnails = document.querySelectorAll('[data-detail-thumb]');
+	const bookingWidget = document.querySelector('.booking-widget');
 
-  /* ── Collect all thumbs ── */
-  const thumbs   = document.querySelectorAll('.dm-thumb');
-  const lightbox = document.getElementById('dmLightbox');
-  const lbImg    = document.getElementById('dmLbImg');
-  const lbCap    = document.getElementById('dmLbCaption');
-  const lbClose  = document.getElementById('dmLbClose');
-  const lbPrev   = document.getElementById('dmLbPrev');
-  const lbNext   = document.getElementById('dmLbNext');
-  const lbOverlay= document.getElementById('dmLbOverlay');
-  const lbCounter= document.getElementById('dmLbCounter');
+	// Optional gallery: swap hero image when a thumbnail is clicked.
+	if (heroImage && thumbnails.length) {
+		thumbnails.forEach((thumb) => {
+			thumb.addEventListener('click', () => {
+				const nextSrc = thumb.getAttribute('data-detail-thumb');
+				const nextAlt = thumb.getAttribute('data-detail-alt') || heroImage.alt;
+				if (!nextSrc) {
+					return;
+				}
+				heroImage.src = nextSrc;
+				heroImage.alt = nextAlt;
 
-  if (!lightbox || !thumbs.length) return;
+				thumbnails.forEach((item) => {
+					item.classList.remove('active');
+				});
+				thumb.classList.add('active');
+			});
+		});
+	}
 
-  /* Build array of { src, caption } from DOM */
-  const images = Array.from(thumbs).map(t => ({
-    src:     t.dataset.src    || t.querySelector('img')?.src || '',
-    caption: t.dataset.caption || '',
-  }));
+	// Subtle focus pulse when booking widget enters viewport.
+	if (bookingWidget && 'IntersectionObserver' in window) {
+		const widgetObserver = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						bookingWidget.classList.add('booking-visible');
+						widgetObserver.disconnect();
+					}
+				});
+			},
+			{ threshold: 0.3 }
+		);
+		widgetObserver.observe(bookingWidget);
+	}
 
-  let currentIdx = 0;
-
-  /* ── Open lightbox ── */
-  function openLb(idx) {
-    currentIdx = idx;
-    showImg(idx);
-    lightbox.classList.add('open');
-    lightbox.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-    lbClose?.focus();
-  }
-
-  /* ── Close lightbox ── */
-  function closeLb() {
-    lightbox.classList.remove('open');
-    lightbox.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-    thumbs[currentIdx]?.focus();
-  }
-
-  /* ── Show image by index ── */
-  function showImg(idx) {
-    currentIdx = (idx + images.length) % images.length;
-    const item = images[currentIdx];
-
-    if (lbImg) {
-      lbImg.style.opacity = '0';
-      lbImg.src = item.src;
-      lbImg.onload = () => {
-        lbImg.style.transition = 'opacity .35s';
-        lbImg.style.opacity = '1';
-      };
-    }
-
-    if (lbCap)     lbCap.textContent     = item.caption;
-    if (lbCounter) lbCounter.textContent = `${currentIdx + 1} / ${images.length}`;
-  }
-
-  /* ── Attach thumb click handlers ── */
-  thumbs.forEach((t, i) => {
-    t.addEventListener('click', () => openLb(i));
-    t.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLb(i); }
-    });
-  });
-
-  /* ── Controls ── */
-  if (lbClose)   lbClose.addEventListener  ('click', closeLb);
-  if (lbOverlay) lbOverlay.addEventListener('click', closeLb);
-  if (lbPrev)    lbPrev.addEventListener   ('click', () => showImg(currentIdx - 1));
-  if (lbNext)    lbNext.addEventListener   ('click', () => showImg(currentIdx + 1));
-
-  /* ── Keyboard ── */
-  document.addEventListener('keydown', e => {
-    if (!lightbox.classList.contains('open')) return;
-    if (e.key === 'ArrowLeft')  showImg(currentIdx - 1);
-    if (e.key === 'ArrowRight') showImg(currentIdx + 1);
-    if (e.key === 'Escape')     closeLb();
-  });
-
-  /* ── Touch swipe inside lightbox ── */
-  let lbTx = 0;
-  lightbox.addEventListener('touchstart', e => { lbTx = e.changedTouches[0].clientX; }, { passive: true });
-  lightbox.addEventListener('touchend',   e => {
-    const diff = lbTx - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) showImg(currentIdx + (diff > 0 ? 1 : -1));
-  }, { passive: true });
-
+	// Preserve current page slug in booking URL if available.
+	const bookButton = document.querySelector('.booking-widget .btn-gold');
+	if (bookButton) {
+		const currentPath = window.location.pathname.split('/').filter(Boolean);
+		const slug = currentPath.length ? currentPath[currentPath.length - 1] : '';
+		if (slug && !bookButton.href.includes('place=')) {
+			const separator = bookButton.href.includes('?') ? '&' : '?';
+			bookButton.href = `${bookButton.href}${separator}place=${encodeURIComponent(slug)}`;
+		}
+	}
 });

@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('image', models.ImageField(upload_to='slides/')),
                 ('title', models.CharField(max_length=200)),
-                ('description', models.TextField()),
+                ('discrption', models.TextField()),
             ],
         ),
     ]

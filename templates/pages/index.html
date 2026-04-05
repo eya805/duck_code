@@ -1,266 +1,302 @@
-{% extends "base.html" %}
-{% load static %}
-
-{#
-HOME PAGE
-Context (optional): slides, stats, categories, landmarks, experiences, quote
-#}
-
-{% block title %}Egypt — أرض الحضارة{% endblock %}
-{% block body_class %}page-home{% endblock %}
-
+{% extends 'base.html' %}
+{% block title %}Home{% endblock %}
+{% block body_class %}page-home{% endblock %}{# FIXED: removed extra spaces around value #}
+{% block nav_home %}active{% endblock %}{# FIXED: removed extra spaces around value #}
 {% block content %}
-<section class="hero" id="home">
-  <div class="hero-slider" id="heroSlider">
-    {% for slide in slides %}
-    <div
-      class="hero-slide {% if forloop.first %}active{% endif %}"
-      style="--bg:url('{{ slide.image.url }}')"
-    >
-      <div class="slide-overlay"></div>
-      <div class="slide-inner">
-        <span class="slide-tag reveal-anim" style="--d: 0.3s"
-          >{{ slide.tag_en }}</span
-        >
-        <h1 class="slide-heading reveal-anim" style="--d: 0.55s">
-          {{ slide.title }}
-        </h1>
-        <p class="slide-sub reveal-anim" style="--d: 0.75s">
-          {{ slide.subtitle_ar }}
-        </p>
-        <p class="slide-desc reveal-anim" style="--d: 0.95s">
-          {{ slide.description }}
-        </p>
-        <div class="slide-btns reveal-anim" style="--d: 1.15s">
-          <a href="{% url 'explore' %}" class="btn btn-gold">Explore Now</a>
-          <a href="{% url 'book' %}" class="btn btn-ghost">Book a Journey</a>
-        </div>
-      </div>
-      <div class="slide-label">
-        <span>{{ slide.location_en }}</span>
-        <span class="slide-label-ar">{{ slide.location_ar }}</span>
-      </div>
-    </div>
-    {% endfor %}
+
+<!-- Hero section -->
+<section class="hero-section reveal">
+  <div class="hero-media" aria-hidden="true">
+    {% if featured_place and featured_place.image %}
+      <img
+        src="{{ featured_place.image.url }}"
+        alt="{{ featured_place.name|default:'—' }}"
+      />
+    {% elif featured_place and featured_place.images.first %}
+      {% with featured_image=featured_place.images.first %}
+        <img
+          src="{{ featured_image.image.url }}"
+          alt="{{ featured_place.name|default:'—' }}"
+        />
+      {% endwith %}
+    {% elif slides %}
+      {% with first_slide=slides|first %}
+        <img
+          src="{{ first_slide.image.url }}"
+          alt="{{ first_slide.title|default:'—' }}"
+        />
+      {% endwith %}
+    {% endif %}
   </div>
 
-  <button
-    class="hero-arrow prev-arrow"
-    id="heroPrev"
-    aria-label="Previous slide"
-  >
-    <i class="fas fa-chevron-left"></i>
-  </button>
-  <button class="hero-arrow next-arrow" id="heroNext" aria-label="Next slide">
-    <i class="fas fa-chevron-right"></i>
-  </button>
+  <div class="hero-overlay"></div>
 
-  <div class="hero-dots" id="heroDots"></div>
-
-  <div class="slide-counter">
-    <span id="currentNum">01</span>
-    <span class="counter-sep"></span>
-    <span class="counter-total" id="totalNum"
-      >{{ slides|length|stringformat:"02d" }}</span
-    >
-  </div>
-
-  <div class="hero-progress-wrap">
-    <div class="hero-progress-bar" id="heroProgress"></div>
-  </div>
-
-  <div class="scroll-cue">
-    <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
-    <span>Scroll</span>
-  </div>
-</section>
-
-{# ════ STATS BAND ════ #}
-<section class="stats-band" id="stats">
-  <div class="stats-inner">
-    {% for stat in stats %}
-    <div class="stat-block reveal-up" style="--rd:{{ forloop.counter0 }}00ms">
-      <i class="{{ stat.icon }} stat-ico"></i>
-      <div class="stat-data">
-        <div class="stat-num-wrap">
-          <span class="stat-num" data-target="{{ stat.number }}">0</span>
-          <span class="stat-suf">{{ stat.suffix }}</span>
-        </div>
-        <span class="stat-lbl">{{ stat.label }}</span>
-      </div>
-    </div>
-    {% if not forloop.last %}
-    <div class="stat-sep"></div>
-    {% endif %} {% endfor %}
-  </div>
-</section>
-
-{# ════ DISCOVER — category cards, each → explore?cat= ════ #} 
-{# ════ DISCOVER— category cards, each → explore?cat= ════ #}
-<section class="discover" id="discover">
-  <div class="discover-head">
-    <span class="eyebrow reveal-up">What Awaits</span>
-    <h2 class="sec-title reveal-up" style="--rd: 0.1s">Discover Egypt</h2>
-    <p class="sec-sub reveal-up" style="--rd: 0.2s">
-      اكتشف كل ما تخبئه أرض الحضارة
+  <div class="hero-content container">
+    <p class="hero-glyphs" aria-hidden="true">𓋹 𓂀 𓆙 𓇯</p>
+    <h1>Discover The Eternal Land Of Pharaohs</h1>
+    <p class="hero-subtitle">
+      Explore Egypt&apos;s timeless wonders from golden temples to hidden oases.
     </p>
+    <div class="hero-actions">
+      <a href="{% url 'explore' %}" class="btn-gold">Explore Now</a>
+      <a href="#sacred-places" class="btn-outline">Watch Tour</a>
+    </div>
   </div>
 
-  <div class="discover-grid discover-grid--{{ categories|length }}">
-    {% for cat in categories %}
-    <a
-      href="{% url 'explore' %}?cat={{ cat.slug }}"
-      class="dcard {% if forloop.first %}dcard-lg{% elif forloop.last %}dcard-wide{% endif %} reveal-up"
-      style="--rd:{{ forloop.counter0 }}00ms"
-      aria-label="{{ cat.name }}"
-    >
-      <div
-        class="dcard-img"
-        style="background-image:url('{{ cat.image.url }}')"
-      ></div>
-      <div class="dcard-gloss"></div>
-      <div class="dcard-body">
-        <i class="{{ cat.icon }} dcard-ico"></i>
-        <div>
-          <span class="dcard-tag">{{ cat.name }}</span>
-          <h3 class="dcard-title">{{ cat.tag_line }}</h3>
-        </div>
-        <span class="dcard-link"
-          >Explore <i class="fas fa-arrow-right"></i
-        ></span>
-      </div>
-    </a>
-    {% empty %}
-    <p class="empty-state">No categories available yet.</p>
-    {% endfor %}
+  <a href="#stats" class="scroll-indicator" aria-label="Scroll to stats">↓</a>
+</section>
+
+<!-- Stats bar -->
+<section class="stats-bar" id="stats">
+  <div class="container stats-grid">
+    <div class="stat-item reveal">
+      <p class="stat-value">{{ total_landmarks|default:'0' }}+</p>
+      <p class="stat-label">Landmarks</p>
+    </div>
+    <div class="stat-item reveal">
+      <p class="stat-value">{{ total_hotels|default:'0' }}+</p>
+      <p class="stat-label">Hotels</p>
+    </div>
+    <div class="stat-item reveal">
+      <p class="stat-value">{{ total_restaurants|default:'0' }}+</p>
+      <p class="stat-label">Restaurants</p>
+    </div>
+    <div class="stat-item reveal">
+      <p class="stat-value">{{ total_cities|default:'0' }}+</p>
+      <p class="stat-label">Cities</p>
+    </div>
   </div>
 </section>
 
-{# ════ LANDMARKS CAROUSEL — each card → place_detail ════ #} 
-{# ════ LANDMARKSCAROUSEL — “Gallery” anchor lives here ════ #}
-<section class="landmarks" id="landmarks">
-  <div class="landmarks-head" id="gallery">
-    <div>
-      <span class="eyebrow reveal-up">Must Visit</span>
-      <h2 class="sec-title reveal-up" style="--rd: 0.1s">Iconic Landmarks</h2>
-      <p class="sec-sub reveal-up" style="--rd: 0.2s">
-        أبرز معالم مصر التاريخية
-      </p>
-    </div>
-    <div class="lm-nav reveal-up" style="--rd: 0.2s">
-      <button class="lm-btn" id="lmPrev" aria-label="Previous">
-        <i class="fas fa-chevron-left"></i>
-      </button>
-      <button class="lm-btn" id="lmNext" aria-label="Next">
-        <i class="fas fa-chevron-right"></i>
-      </button>
-    </div>
-  </div>
+<!-- Featured landmarks -->
+<section class="section sacred-places" id="sacred-places">
+  <div class="container">
+    <h2 class="section-title reveal">Sacred Places</h2>
 
-  <div class="lm-viewport">
-    <div class="lm-track" id="lmTrack">
-      {% for place in landmarks %}
-      <a
-        href="{% if place.slug %}{% url 'place' place.slug %}{% else %}#{% endif %}"
-        class="lm-card reveal-up"
-        style="--rd:{{ forloop.counter0 }}00ms"
-      >
-        <div
-          class="lm-img"
-          style="background-image:url('{{ place.image.url }}')"
-        >
-          <span class="lm-badge">{{ place.badge }}</span>
-          {% if place.rating and place.rating >= 4.8 %}<span class="ai-badge">AI Recommended</span>{% endif %}
-          {% if place.rating or place.price %}
-          <div class="card-hover-meta">
-            {% if place.rating %}<i class="fas fa-star"></i><span>{{ place.rating }}</span>{% endif %}
-            {% if place.price %}<i class="fas fa-tag"></i><span>{{ place.price }}</span>{% endif %}
-          </div>
-          {% endif %}
-        </div>
-        <div class="lm-info">
-          <h4 class="lm-name">{{ place.name }}</h4>
-          <p class="lm-name-ar">{{ place.name_ar }}</p>
-          <div class="lm-meta">
-            <span
-              ><i class="fas fa-location-dot"></i> {{ place.location }}</span
+    <div class="hiero-divider reveal">
+      <span class="hiero-line"></span>
+      <span class="hiero-glyph">𓂀 𓆙 𓇯</span>
+      <span class="hiero-line"></span>
+    </div>
+
+    {% if featured_places %}
+      <div class="places-grid">
+        {% for place in featured_places %}
+          <article class="place-card reveal">
+
+            <a
+              href="{% if place.slug %}{% url 'place' place.slug %}{% else %}{% url 'explore' %}{% endif %}"
+              class="place-card-media"
             >
-            <span class="lm-rating"
-              ><i class="fas fa-star"></i> {{ place.rating }}</span
-            >
-          </div>
-        </div>
-      </a>
-      {% empty %}
-      <p class="empty-state">No landmarks to display.</p>
-      {% endfor %}
-    </div>
-  </div>
-</section>
+              {% if place.image %}
+                <img src="{{ place.image.url }}" alt="{{ place.name|default:'—' }}" />
+              {% elif place.images.first %}
+                {% with card_image=place.images.first %}
+                  <img src="{{ card_image.image.url }}" alt="{{ place.name|default:'—' }}" />
+                {% endwith %}
+              {% endif %}
 
-{# ════ EXPERIENCE SECTION ════ #} {# ════ EXPERIENCE SECTION ════ #}
-<section class="experience" id="experience">
-  <div class="exp-wrap">
-    <div class="exp-left">
-      <span class="eyebrow reveal-up">Curated Experiences</span>
-      <h2 class="sec-title sec-title-light reveal-up" style="--rd: 0.1s">
-        Plan Your Perfect Journey
-      </h2>
-      <p class="sec-body reveal-up" style="--rd: 0.2s">
-        From sunrise Nile cruises to moonlit desert drives — Egypt reveals
-        herself one wonder at a time.
-      </p>
-      <a
-        href="{% url 'book' %}"
-        class="btn btn-gold reveal-up"
-        style="--rd: 0.3s"
-        >Start Planning</a
-      >
-    </div>
-    <div class="exp-right">
-      {% for exp in experiences %}
-      <div class="exp-card reveal-up" style="--rd:{{ forloop.counter0 }}00ms">
-        <div class="exp-ico"><i class="{{ exp.icon }}"></i></div>
-        <div>
-          <h4>{{ exp.title }}</h4>
-          <p>{{ exp.description }}</p>
-        </div>
+              <span class="place-badge">
+                {% if place.category %}
+                  {{ place.category }}
+                {% elif place.type %}
+                  {{ place.type }}
+                {% else %}
+                  Landmark
+                {% endif %}
+              </span>
+            </a>
+
+            <div class="place-card-content">
+              <h3>{{ place.name|default:'—' }}</h3>
+              {# FIXED: default filter cannot take a variable as fallback #}
+              <p class="place-rating">
+                ★
+                {% if place.rating %}
+                  {{ place.rating }}
+                {% else %}
+                  —
+                {% endif %}
+              </p>
+              <p class="place-location">{{ place.location|default:'—' }}</p>
+              <a
+                href="{% if place.slug %}{% url 'place' place.slug %}{% else %}{% url 'explore' %}{% endif %}"
+                class="place-link"
+              >Explore →</a>
+            </div>
+
+          </article>
+        {% endfor %}
       </div>
-      {% endfor %}
+    {% else %}
+      <div class="empty-state reveal">
+        <p class="hiero-glyph">𓂀 𓆙 𓇯</p>
+        <h3>No featured places yet</h3>
+        <p>The sands of time are preparing new destinations.</p>
+        <a href="{% url 'explore' %}" class="btn-gold">View All Destinations</a>
+      </div>
+    {% endif %}
+
+    <div class="section-footer reveal">
+      <a href="{% url 'explore' %}" class="btn-gold">View All Landmarks</a>
     </div>
   </div>
 </section>
 
-{# ════ QUOTE (optional) ════ #}
-{% if quote %}
-<section class="quote-section">
-  <div class="quote-bg"{% if quote.background_image %} style="background-image:url('{{ quote.background_image.url }}')"{% endif %}></div>
-  <div class="quote-veil"></div>
-  <div class="quote-inner">
-    <div class="quote-ornament">
-      <span></span><i class="fas fa-ankh"></i><span></span>
-    </div>
-    <blockquote class="quote-text reveal-up">"{{ quote.text }}"</blockquote>
-    <cite class="quote-by reveal-up" style="--rd: 0.2s"
-      >— {{ quote.author }}</cite
-    >
-  </div>
-</section>
-{% endif %}
+<!-- About teaser -->
+<section class="section about-teaser">
+  <div class="container split-layout">
 
-{# ════ CTA BAND ════ #}
-<section class="cta-band">
-  <div class="cta-inner">
-    <div class="reveal-up">
-      <span class="eyebrow" style="color: var(--gold)"
-        >Your Adventure Awaits</span
-      >
-      <h2 class="sec-title sec-title-light">Ready to Discover Egypt?</h2>
+    <div class="split-content reveal">
+      <p class="eyebrow">Our Story</p>
+      <h2>Born from the Heart of Kemet</h2>
+      <p>
+        {{ about_text|default:'Kemetly curates timeless journeys through Egypt with care, heritage, and modern comfort.'|truncatewords:50 }}
+      </p>
+      <a href="{% url 'about' %}" class="btn-outline">Discover Our Story</a>
     </div>
-    <div class="cta-actions reveal-up" style="--rd: 0.2s">
-      <a href="{% url 'explore' %}" class="btn btn-gold">Start Exploring</a>
-      <a href="{% url 'book' %}" class="btn btn-outline-light">Book Now</a>
+
+    <div class="split-media reveal">
+      <div class="decor-frame">
+        {% if featured_image and featured_image.url %}
+          <img src="{{ featured_image.url }}" alt="{{ featured_image_alt|default:'—' }}" />
+        {% elif featured_place and featured_place.image %}
+          <img src="{{ featured_place.image.url }}" alt="{{ featured_place.name|default:'—' }}" />
+        {% elif featured_place and featured_place.images.first %}
+          {% with teaser_image=featured_place.images.first %}
+            <img src="{{ teaser_image.image.url }}" alt="{{ featured_place.name|default:'—' }}" />
+          {% endwith %}
+        {% endif %}
+      </div>
     </div>
+
   </div>
 </section>
-{% endblock content %}
+
+<!-- Hotels preview -->
+<section class="section hotels-preview">
+  <div class="container">
+    <h2 class="section-title reveal">Royal Chambers</h2>
+    <p class="section-subtitle reveal">Where Pharaohs Would Rest</p>
+
+    <div class="hotel-row">
+      {% if featured_hotels %}
+        {% for hotel in featured_hotels %}
+          <article class="hotel-card reveal">
+
+            <a
+              href="{% if hotel.slug %}{% url 'place' hotel.slug %}{% else %}{% url 'explore' %}?type=hotel{% endif %}"
+              class="hotel-card-media"
+            >
+              {% if hotel.image %}
+                <img src="{{ hotel.image.url }}" alt="{{ hotel.name|default:'—' }}" />
+              {% elif hotel.images.first %}
+                {% with hotel_image=hotel.images.first %}
+                  <img src="{{ hotel_image.image.url }}" alt="{{ hotel.name|default:'—' }}" />
+                {% endwith %}
+              {% endif %}
+            </a>
+
+            <div class="hotel-card-content">
+              <h3>{{ hotel.name|default:'—' }}</h3>
+              {# FIXED: default filter cannot take a variable as fallback #}
+              <p class="hotel-meta">
+                From
+                {% if hotel.price_from %}
+                  {{ hotel.price_from }}
+                {% elif hotel.price %}
+                  {{ hotel.price }}
+                {% else %}
+                  —
+                {% endif %}
+              </p>
+              <p class="hotel-meta">
+                ★ {{ hotel.rating|default:'—' }} · {{ hotel.location|default:'—' }}
+              </p>
+              {# FIXED: removed {% url 'book' %} — replaced with safe explore fallback #}
+              <a
+                href="{% if hotel.slug %}{% url 'place' hotel.slug %}{% else %}{% url 'explore' %}?type=hotel{% endif %}"
+                class="btn-gold"
+              >Book Now</a>
+            </div>
+
+          </article>
+        {% endfor %}
+      {% else %}
+        <article class="hotel-card reveal">
+          <div class="hotel-card-content">
+            <h3>{{ default_hotel_title|default:'—' }}</h3>
+            <p class="hotel-meta">From {{ default_hotel_price|default:'—' }}</p>
+            <p class="hotel-meta">
+              ★ {{ default_hotel_rating|default:'—' }} · {{ default_hotel_location|default:'—' }}
+            </p>
+            <a href="{% url 'explore' %}?type=hotel" class="btn-gold">Browse Hotels</a>
+          </div>
+        </article>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+
+<!-- Restaurants preview -->
+<section class="section restaurants-preview">
+  <div class="container">
+    <h2 class="section-title reveal">The Banquet Hall</h2>
+    <p class="section-subtitle reveal">Taste of Ancient Flavors</p>
+
+    {% if featured_restaurants %}
+      <div class="places-grid">
+        {% for restaurant in featured_restaurants %}
+          <article class="place-card reveal">
+
+            <a
+              href="{% if restaurant.slug %}{% url 'place' restaurant.slug %}{% else %}{% url 'explore' %}?type=restaurant{% endif %}"
+              class="place-card-media"
+            >
+              {% if restaurant.image %}
+                <img src="{{ restaurant.image.url }}" alt="{{ restaurant.name|default:'—' }}" />
+              {% elif restaurant.images.first %}
+                {% with restaurant_image=restaurant.images.first %}
+                  <img src="{{ restaurant_image.image.url }}" alt="{{ restaurant.name|default:'—' }}" />
+                {% endwith %}
+              {% endif %}
+              <span class="place-badge">Restaurant</span>
+            </a>
+
+            <div class="place-card-content">
+              <h3>{{ restaurant.name|default:'—' }}</h3>
+              <p class="place-rating">★ {{ restaurant.rating|default:'—' }}</p>
+              <p class="place-location">
+                {{ restaurant.cuisine|default:'—' }} · {{ restaurant.price_range|default:'—' }}
+              </p>
+              <a
+                href="{% if restaurant.slug %}{% url 'place' restaurant.slug %}{% else %}{% url 'explore' %}?type=restaurant{% endif %}"
+                class="place-link"
+              >Explore →</a>
+            </div>
+
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state reveal">
+        <p class="hiero-glyph">𓂀 𓆙 𓇯</p>
+        <h3>No featured restaurants yet</h3>
+        <p>Ancient flavors are being prepared for your next visit.</p>
+        <a href="{% url 'explore' %}?type=restaurant" class="btn-gold">Browse Restaurants</a>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+<!-- CTA banner -->
+<section class="cta-banner reveal">
+  <div class="container cta-content">
+    <h2>Begin Your Journey Through Eternity</h2>
+    <a href="{% url 'explore' %}" class="btn-gold">Start Exploring</a>
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,35 @@
+<div class="booking-widget reveal">
+  <h3>Reserve Your Visit</h3>
+
+  {# FIXED: default filter cannot take a variable as fallback #}
+  {% if service.price or place.price %}
+    <div class="price-display">
+      <span class="price-from">From</span>
+      <span class="price-amount">
+        ${% if service.price %}{{ service.price }}{% elif place.price %}{{ place.price }}{% else %}—{% endif %}
+      </span>
+      <span class="price-per">/ person</span>
+    </div>
+  {% endif %}
+
+  <a
+    href="{% url 'book' %}{% if place.slug %}?place={{ place.slug }}{% endif %}"
+    class="btn-gold btn-full"
+  >
+    Book Now — {{ place.name|default:'—' }}
+  </a>
+
+  {# FIXED: default filter cannot take a variable as fallback #}
+  {% if service.phone or place.phone %}
+    <a
+      href="tel:{% if service.phone %}{{ service.phone }}{% elif place.phone %}{{ place.phone }}{% endif %}"
+      class="btn-outline btn-full"
+    >
+      📞 Call for Reservation
+    </a>
+  {% endif %}
+
+  <div class="booking-note">
+    <p>𓋹 Free cancellation up to 24h before visit</p>
+  </div>
+</div>

@@ -1,19 +1,44 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block title %}Book — Egypt Tourism{% endblock %}
-{% block body_class %}page-book{% endblock %}
-
-{% block content %}
-<section class="discover">
-	<div class="discover-head">
-		<span class="eyebrow reveal-up">Reservations</span>
-		<h1 class="sec-title reveal-up" style="--rd: 0.1s">Book Your Journey</h1>
-		<p class="sec-sub reveal-up" style="--rd: 0.2s">Tell us what you want to see — we’ll tailor a heritage-luxury itinerary.</p>
-		<div class="slide-btns reveal-up" style="--rd: 0.3s">
-			<a href="{% url 'explore' %}" class="btn btn-gold">Explore Destinations</a>
-			<a href="#footer-contact" class="btn btn-ghost">Contact Us</a>
-		</div>
-	</div>
+{% extends 'base.html' %} {% block title %}Booking{% endblock %} {% block
+body_class %}page-booking{% endblock %} {% block content %}
+<section class="about-hero reveal">
+  <div class="container">
+    <p class="hero-glyphs" aria-hidden="true">𓋹 𓂀 𓆙</p>
+    <h1>Confirm Your Journey</h1>
+    <p>Finalize your reservation details to begin the experience.</p>
+  </div>
 </section>
-{% endblock content %}
+
+<section class="section booking-page">
+  <div class="container booking-layout reveal">
+    {% if request.GET.place or request.GET.date or request.GET.guests %}
+    <div class="papyrus-box">
+      <h2>Reservation Details</h2>
+      <p>
+        <strong>Selected Place:</strong> {{ request.GET.place|default:'—' }}
+      </p>
+      <p><strong>Travel Date:</strong> {{ request.GET.date|default:'—' }}</p>
+      <p><strong>Guests:</strong> {{ request.GET.guests|default:'—' }}</p>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <p class="hiero-glyph">𓂀 𓆙 𓇯</p>
+      <h3>No reservation selected</h3>
+      <p>Browse our destinations and pick a place to begin your journey.</p>
+    </div>
+    {% endif %}
+
+    <div class="booking-widget">
+      <h3>Need More Options?</h3>
+      <p>
+        Browse all destinations and choose the perfect stop for your itinerary.
+      </p>
+      <a href="{% url 'explore' %}" class="btn-gold btn-full"
+        >Back to Explore</a
+      >
+      <a href="{% url 'about' %}" class="btn-outline btn-full"
+        >Contact Kemetly</a
+      >
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,2 +1,15 @@
-{% extends "base.html" %} {% load static %} {% block title %}About Us — Egypt
-Tourism{% endblock %}
+{% extends 'base.html' %} {% block title %}About{% endblock %} {% block
+body_class %}page-about{% endblock %} {% block nav_about %}active{% endblock %}
+{% block content %}
+<section class="about-hero reveal">
+  <div class="container">
+    <p class="hero-glyphs" aria-hidden="true">𓋹 𓂀 𓆙 𓇯</p>
+    <h1>The Story of Kemetly</h1>
+    <p>
+      {{ about_subtitle|default:'Born from a love for the eternal land of
+      Egypt.' }}
+    </p>
+    <a href="{% url 'explore' %}" class="btn-gold">Start Exploring</a>
+  </div>
+</section>
+{% endblock %}

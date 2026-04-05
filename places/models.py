@@ -5,7 +5,7 @@ from django.utils.text import slugify
 class Place(models.Model):
     name = models.CharField(max_length=120,verbose_name="Name")
     slug = models.SlugField(unique=True,blank=True,null=True)
-    discrption = models.TextField(verbose_name="Description")
+    description = models.TextField(verbose_name="Description", db_column="discrption")
     active = models.BooleanField(default=True,verbose_name="Availability")
     created_at = models.DateTimeField(auto_now_add=True,verbose_name="Original date")
     updated_at = models.DateTimeField(auto_now=True,verbose_name="Last date")

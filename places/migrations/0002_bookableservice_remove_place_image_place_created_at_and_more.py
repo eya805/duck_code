@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='place',
-            name='discrption',
+            name='description',
             field=models.TextField(verbose_name='Description'),
         ),
         migrations.AlterField(
