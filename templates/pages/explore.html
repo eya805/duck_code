@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Explore — Egypt Tourism{% endblock %}
+{% block body_class %}page-explore{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'places/explore.css' %}" />
+{% endblock %}
+
+{% block content %}
+<section class="explore-header">
+	<div class="eh-inner">
+		<nav class="dh-breadcrumb" aria-label="Breadcrumb">
+			<a href="{% url 'pages' %}">Home</a>
+			<i class="fas fa-chevron-right"></i>
+			<span>Explore</span>
+			{% if request.GET.q %}<i class="fas fa-chevron-right"></i><span>"{{ request.GET.q }}"</span>{% endif %}
+		</nav>
+
+		<div class="eh-title-row">
+			<div>
+				<span class="eyebrow">Search &amp; Discover</span>
+				<h1 class="eh-title">Explore Egypt</h1>
+				<p class="eh-sub">Search for pyramids, temples, museums, and Nile cruises.</p>
+			</div>
+
+			<form class="eh-search" action="{% url 'explore' %}" method="get" role="search">
+				<div class="eh-search-field">
+					<i class="fas fa-magnifying-glass"></i>
+					<input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Search pyramids, temples, Nile cruises…" autocomplete="off" aria-label="Search places" />
+					{% if request.GET.q %}<a href="{% url 'explore' %}" class="eh-clear" aria-label="Clear search"><i class="fas fa-xmark"></i></a>{% endif %}
+				</div>
+				<button type="submit" class="eh-search-btn">Search</button>
+			</form>
+		</div>
+	</div>
+</section>
+
+<section class="places-section">
+	<div class="ps-inner">
+		<div class="explore-empty">
+			<div class="ee-icon"><i class="fas fa-compass"></i></div>
+			<h3 class="ee-title">Start exploring</h3>
+			<p class="ee-sub">Use the search bar above to find your next destination.</p>
+			<a href="{% url 'pages' %}" class="btn btn-gold">Back to Home</a>
+		</div>
+	</div>
+</section>
+{% endblock content %}

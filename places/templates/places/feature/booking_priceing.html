@@ -1,0 +1,78 @@
+{% load static %} {# ══════════════════════════════════════════════════════
+BOOKING CARD PARTIAL Path :
+mytravel/places/templates/places/feature/booking_priceing.html Used by:
+places/templates/places/place.html {% include
+"places/feature/booking_priceing.html" with booking=booking place=place %}
+───────────────────────────────────────────────────── Context (passed via
+include with): booking.price_from decimal / str booking.price_currency str
+(default "EGP") booking.rating float booking.review_count int
+booking.booking_url url / str place Place instance
+══════════════════════════════════════════════════════ #}
+
+<div class="bk-card" id="bookingCard">
+  {# ── Price header ── #}
+  <div class="bk-header">
+    <span class="bk-label">From</span>
+    <div class="bk-price-wrap">
+      <span class="bk-price">{{ booking.price_from }}</span>
+      <span class="bk-currency"
+        >{{ booking.price_currency|default:"EGP" }}</span
+      >
+    </div>
+    <span class="bk-per">/ per person</span>
+  </div>
+
+  {# ── Star rating ── #}
+  <div class="bk-rating">
+    <div class="bk-stars" aria-label="Rating {{ booking.rating }} out of 5">
+      {% for i in "12345" %} {% if booking.rating >= forloop.counter %}
+      <i class="fas fa-star bk-star bk-star--full"></i>
+      {% elif booking.rating >= forloop.counter|add:"-0.5" %}
+      <i class="fas fa-star-half-stroke bk-star bk-star--half"></i>
+      {% else %}
+      <i class="far fa-star bk-star bk-star--empty"></i>
+      {% endif %} {% endfor %}
+    </div>
+    <span class="bk-rating-num">{{ booking.rating }}</span>
+    <span class="bk-review-count">({{ booking.review_count }} reviews)</span>
+  </div>
+
+  <div class="bk-divider"></div>
+
+  {# ── What's included ── #}
+  <ul class="bk-includes">
+    <li><i class="fas fa-check"></i> Expert local guide</li>
+    <li><i class="fas fa-check"></i> Entry fees included</li>
+    <li><i class="fas fa-check"></i> Private transport</li>
+    <li><i class="fas fa-check"></i> Free cancellation (48 hrs)</li>
+  </ul>
+
+  <div class="bk-divider"></div>
+
+  {# ── CTAs ── #}
+  <a href="{{ booking.booking_url|default:'#' }}" class="bk-cta-btn">
+    <i class="fas fa-calendar-check"></i>
+    Book This Experience
+  </a>
+
+  <a
+    href="{% url 'explore' %}?cat={{ place.category.slug }}"
+    class="bk-alt-link"
+  >
+    <i class="fas fa-compass"></i>
+    More in {{ place.category.name|default:"Egypt" }}
+  </a>
+
+  {# ── Trust badges ── #}
+  <div class="bk-trust">
+    <div class="bk-trust-item">
+      <i class="fas fa-shield-halved"></i><span>Secure Booking</span>
+    </div>
+    <div class="bk-trust-item">
+      <i class="fas fa-headset"></i><span>24/7 Support</span>
+    </div>
+    <div class="bk-trust-item">
+      <i class="fas fa-rotate-left"></i><span>Easy Refunds</span>
+    </div>
+  </div>
+</div>

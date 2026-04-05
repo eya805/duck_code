@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    {% load static %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>{% block title %}Egypt — أرض الحضارة{% endblock %}</title>
+
+    <meta
+      name="description"
+      content="{% block meta_desc %}Discover the timeless wonders of Egypt, from the Nile to the desert and beyond.{% endblock %}"
+    />
+    <meta
+      property="og:title"
+      content="{% block og_title %}Visit Egypt{% endblock %}"
+    />
+    <meta
+      property="og:description"
+      content="{% block og_desc %}Your gateway to the land of the pharaohs.{% endblock %}"
+    />
+    {% block og_image %}{% endblock %}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    {# ── Global CSS → mytravel/static/css/style.css ── #}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    {% block extra_css %}{% endblock %}
+  </head>
+
+  <body class="{% block body_class %}{% endblock %}">
+    {# ── Preloader (fades out via static/js/script.js) ── #}
+    <div class="intro-veil" id="introVeil" aria-hidden="false">
+      <div class="intro-veil-inner">
+        <i class="fas fa-ankh" aria-hidden="true"></i>
+        <span class="intro-veil-text">EGYPT</span>
+      </div>
+    </div>
+    <!-- ══════════════════════════════════
+       TOP NAVIGATION — 4 links
+       Home · About · Explore · Book
+  ══════════════════════════════════ -->
+    <header class="topnav" id="topnav">
+      <a href="{% url 'pages' %}" class="tnav-brand">
+        <i class="fas fa-ankh tnav-anchor"></i>
+        <div class="tnav-brand-text">
+          <span class="tnav-en">Egypt</span>
+          <span class="tnav-ar">مصر</span>
+        </div>
+      </a>
+
+      <nav class="tnav-links" aria-label="Main navigation">
+        <a
+          href="{% url 'pages' %}"
+          class="tnav-link {% if request.resolver_match.url_name == 'pages' %}active{% endif %}"
+        >
+          <span>Home</span>
+        </a>
+        <a
+          href="{% url 'about' %}"
+          class="tnav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}"
+        >
+          <span>About</span>
+        </a>
+        {# explore = the single list/search view in places app #}
+        <a
+          href="{% url 'explore' %}"
+          class="tnav-link {% if request.resolver_match.url_name == 'explore' %}active{% endif %}"
+        >
+          <span>Explore</span>
+        </a>
+        <a href="{% url 'pages' %}#gallery" class="tnav-link">
+          <span>Gallery</span>
+        </a>
+        <a href="#footer-contact" class="tnav-link">
+          <span>Contact</span>
+        </a>
+      </nav>
+
+      <div class="tnav-actions">
+        <button
+          class="tnav-search-btn"
+          id="navSearchTrigger"
+          aria-label="Quick search"
+        >
+          <i class="fas fa-magnifying-glass"></i>
+        </button>
+        <a href="{% url 'book' %}" class="tnav-cta">
+          <i class="fas fa-calendar-check"></i>
+          <span>Book Now</span>
+        </a>
+      </div>
+
+      <button
+        class="tnav-ham"
+        id="tnavHam"
+        aria-label="Open menu"
+        aria-expanded="false"
+      >
+        <span></span><span></span><span></span>
+      </button>
+    </header>
+
+    {# ── Mobile drawer ── #}
+    <div class="tnav-drawer" id="tnavDrawer" aria-hidden="true">
+      <div class="drawer-inner">
+        <nav class="drawer-links">
+          <a
+            href="{% url 'pages' %}"
+            class="drawer-link {% if request.resolver_match.url_name == 'pages' %}active{% endif %}"
+          >
+            Home <span class="d-ar">الرئيسية</span>
+          </a>
+          <a
+            href="{% url 'about' %}"
+            class="drawer-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}"
+          >
+            About <span class="d-ar">عن مصر</span>
+          </a>
+          <a
+            href="{% url 'explore' %}"
+            class="drawer-link {% if request.resolver_match.url_name == 'explore' %}active{% endif %}"
+          >
+            Explore <span class="d-ar">استكشف مصر</span>
+          </a>
+          <a href="{% url 'pages' %}#gallery" class="drawer-link">
+            Gallery <span class="d-ar">صور</span>
+          </a>
+          <a href="#footer-contact" class="drawer-link">
+            Contact <span class="d-ar">تواصل</span>
+          </a>
+        </nav>
+        <a href="{% url 'book' %}" class="drawer-cta">Book Your Journey</a>
+      </div>
+    </div>
+    <div class="drawer-veil" id="drawerVeil"></div>
+
+    {# ── Quick search overlay — posts to explore view with ?q= ── #}
+    <div class="search-overlay" id="searchOverlay" aria-hidden="true">
+      <div class="search-overlay-inner">
+        <button class="search-close" id="searchClose" aria-label="Close search">
+          <i class="fas fa-xmark"></i>
+        </button>
+        <form class="search-form" action="{% url 'explore' %}" method="GET">
+          <div class="search-field">
+            <i class="fas fa-magnifying-glass"></i>
+            <input
+              type="text"
+              name="q"
+              placeholder="Search pyramids, temples, Nile cruises…"
+              autocomplete="off"
+              autofocus
+              id="searchInput"
+            />
+          </div>
+          <div class="search-hints">
+            <span class="hint-label">Popular:</span>
+            <a href="{% url 'explore' %}?q=pyramids" class="hint-tag"
+              >Pyramids of Giza</a
+            >
+            <a href="{% url 'explore' %}?q=karnak" class="hint-tag"
+              >Karnak Temple</a
+            >
+            <a href="{% url 'explore' %}?q=nile" class="hint-tag"
+              >Nile Cruise</a
+            >
+            <a href="{% url 'explore' %}?q=abu-simbel" class="hint-tag"
+              >Abu Simbel</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ══ PAGE CONTENT ══ -->
+    <main id="mainContent">{% block content %}{% endblock %}</main>
+
+    <!-- ══ FOOTER ══ -->
+    <footer class="footer">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="f-logo">
+            <i class="fas fa-ankh"></i>
+            <span>Egypt</span>
+          </div>
+          <p class="f-tagline">
+            Your gateway to discovering the timeless wonders of Egypt —
+            <span class="f-ar">أرض الكنانة</span>.
+          </p>
+          <div class="f-social">
+            <a href="#" aria-label="Instagram"
+              ><i class="fab fa-instagram"></i
+            ></a>
+            <a href="#" aria-label="Facebook"
+              ><i class="fab fa-facebook-f"></i
+            ></a>
+            <a href="#" aria-label="X"><i class="fab fa-x-twitter"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <div class="f-col">
+          <h5 class="f-head">Discover</h5>
+          <ul>
+            <li><a href="{% url 'explore' %}?cat=ancient">Ancient Egypt</a></li>
+            <li><a href="{% url 'explore' %}?cat=museum">Museums</a></li>
+            <li>
+              <a href="{% url 'explore' %}?cat=beach">Nile &amp; Waterfront</a>
+            </li>
+            <li>
+              <a href="{% url 'explore' %}?cat=food">Cuisine &amp; Cafes</a>
+            </li>
+            <li>
+              <a href="{% url 'explore' %}?cat=park">Oases &amp; Gardens</a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="f-col">
+          <h5 class="f-head">Services</h5>
+          <ul>
+            <li><a href="{% url 'book' %}">Book a Tour</a></li>
+            <li>
+              <a href="{% url 'book' %}?service=transfer">Private Transfers</a>
+            </li>
+            <li>
+              <a href="{% url 'book' %}?service=walk">Guided Heritage Walks</a>
+            </li>
+            <li>
+              <a href="{% url 'book' %}?service=photo">Photography Tours</a>
+            </li>
+            <li><a href="{% url 'book' %}?service=cruise">Nile Cruises</a></li>
+          </ul>
+        </div>
+
+        <div class="f-col">
+          <h5 class="f-head">Company</h5>
+          <ul>
+            <li><a href="{% url 'about' %}">About Egypt</a></li>
+            <li><a href="{% url 'about' %}#team">Our Team</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#footer-contact">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="f-contact" id="footer-contact">
+          <h5 class="f-head">Contact Us</h5>
+          <p><i class="fas fa-location-dot"></i> Cairo, Egypt</p>
+          <p><i class="fas fa-phone"></i> +20 3 XXX XXXX</p>
+          <p><i class="fas fa-envelope"></i> hello@visitegypt.com</p>
+          <div class="f-badge">
+            <i class="fas fa-shield-halved"></i>
+            <span>Certified Tourism Partner</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bar">
+        <p>© {% now "Y" %} Visit Egypt · All Rights Reserved</p>
+        <p>
+          Crafted with <i class="fas fa-heart"></i> for
+          <span class="f-ar">مصر</span>
+        </p>
+      </div>
+    </footer>
+
+    {# ── Global JS → mytravel/static/js/script.js ── #}
+    <script src="{% static 'js/script.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

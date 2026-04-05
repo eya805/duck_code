@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Book — Egypt Tourism{% endblock %}
+{% block body_class %}page-book{% endblock %}
+
+{% block content %}
+<section class="discover">
+	<div class="discover-head">
+		<span class="eyebrow reveal-up">Reservations</span>
+		<h1 class="sec-title reveal-up" style="--rd: 0.1s">Book Your Journey</h1>
+		<p class="sec-sub reveal-up" style="--rd: 0.2s">Tell us what you want to see — we’ll tailor a heritage-luxury itinerary.</p>
+		<div class="slide-btns reveal-up" style="--rd: 0.3s">
+			<a href="{% url 'explore' %}" class="btn btn-gold">Explore Destinations</a>
+			<a href="#footer-contact" class="btn btn-ghost">Contact Us</a>
+		</div>
+	</div>
+</section>
+{% endblock content %}

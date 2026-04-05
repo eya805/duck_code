@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{% if query %}"{{ query }}" — Explore Egypt{% else %}Explore Egypt{% endif %}{% endblock %}
+{% block meta_desc %}Discover the best landmarks, museums, and temples across Egypt.{% endblock %}
+{% block body_class %}page-explore{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'places/explore.css' %}" />
+{% endblock %}
+
+{% block content %}
+<section class="explore-header">
+  <div class="eh-inner">
+    <nav class="dh-breadcrumb" aria-label="Breadcrumb">
+      <a href="{% url 'pages' %}">Home</a>
+      <i class="fas fa-chevron-right"></i>
+      <span>Explore</span>
+      {% if query %}<i class="fas fa-chevron-right"></i><span>"{{ query }}"</span>{% endif %}
+    </nav>
+
+    <div class="eh-title-row">
+      <div>
+        <span class="eyebrow">{% if query %}Search Results{% else %}All Places{% endif %}</span>
+        <h1 class="eh-title">{% if query %}Results for "{{ query }}"{% else %}Explore Egypt{% endif %}</h1>
+        <p class="eh-sub">{{ total_count }} place{{ total_count|pluralize }} found</p>
+      </div>
+
+      <form class="eh-search" action="{% url 'explore' %}" method="get" role="search">
+        <div class="eh-search-field">
+          <i class="fas fa-magnifying-glass"></i>
+          <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search pyramids, temples, Nile cruises…" autocomplete="off" aria-label="Search places" />
+          {% if query %}<a href="{% url 'explore' %}" class="eh-clear" aria-label="Clear search"><i class="fas fa-xmark"></i></a>{% endif %}
+        </div>
+        <button type="submit" class="eh-search-btn">Search</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="places-section">
+  <div class="ps-inner">
+    {% if places %}
+    <div class="places-grid" id="placesGrid">
+      {% for place in places %}
+      <a href="{% if place.slug %}{% url 'place' place.slug %}{% else %}#{% endif %}" class="place-card reveal-up" style="--rd:{{ forloop.counter0 }}00ms">
+        <div class="pc-img-wrap">
+          {% with place.images.first as img %}
+          <div class="pc-img {% if not img %}pc-img--placeholder{% endif %}"{% if img %} style="background-image:url('{{ img.image.url }}')"{% endif %}></div>
+          {% endwith %}
+
+          {% with svc=place.bookableservice %}
+          {% if svc.rating or svc.price %}
+          <div class="card-hover-meta">
+            {% if svc.rating %}<i class="fas fa-star"></i><span>{{ svc.rating }}</span>{% endif %}
+            {% if svc.price %}<i class="fas fa-tag"></i><span>{{ svc.price }}</span>{% endif %}
+          </div>
+          {% endif %}
+          {% endwith %}
+        </div>
+
+        <div class="pc-info">
+          <h3 class="pc-name">{{ place.name }}</h3>
+          {% if place.discrption %}<p class="pc-name-ar">{{ place.discrption|truncatechars:64 }}</p>{% endif %}
+          <div class="pc-meta">
+            <span class="pc-loc"><i class="fas fa-location-dot"></i> Egypt</span>
+            {% if place.bookableservice.rating %}<span class="pc-rating"><i class="fas fa-star"></i> {{ place.bookableservice.rating }}</span>{% endif %}
+          </div>
+          <span class="pc-cta">View Details <i class="fas fa-arrow-right"></i></span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+
+    {% if page_obj and page_obj.has_other_pages %}
+    <nav class="pagination" aria-label="Page navigation">
+      {% if page_obj.has_previous %}
+      <a href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.previous_page_number }}" class="pag-btn pag-btn--prev"><i class="fas fa-chevron-left"></i><span>Previous</span></a>
+      {% else %}
+      <span class="pag-btn pag-btn--prev pag-btn--disabled"><i class="fas fa-chevron-left"></i><span>Previous</span></span>
+      {% endif %}
+
+      <div class="pag-numbers">
+        {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+        <span class="pag-num pag-num--active">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <a href="?{% if query %}q={{ query }}&{% endif %}page={{ num }}" class="pag-num">{{ num }}</a>
+        {% endif %}
+        {% endfor %}
+      </div>
+
+      {% if page_obj.has_next %}
+      <a href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.next_page_number }}" class="pag-btn pag-btn--next"><span>Next</span><i class="fas fa-chevron-right"></i></a>
+      {% else %}
+      <span class="pag-btn pag-btn--next pag-btn--disabled"><span>Next</span><i class="fas fa-chevron-right"></i></span>
+      {% endif %}
+    </nav>
+    {% endif %}
+    {% else %}
+    <div class="explore-empty">
+      <div class="ee-icon"><i class="fas fa-compass"></i></div>
+      <h3 class="ee-title">No places found</h3>
+      <p class="ee-sub">{% if query %}No results for "<strong>{{ query }}</strong>". Try a different keyword.{% else %}No places yet. Check back soon.{% endif %}</p>
+      <a href="{% url 'explore' %}" class="btn btn-gold">Browse All Places</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock content %}

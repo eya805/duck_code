@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+{% load static %}
+
+{#
+HOME PAGE
+Context (optional): slides, stats, categories, landmarks, experiences, quote
+#}
+
+{% block title %}Egypt — أرض الحضارة{% endblock %}
+{% block body_class %}page-home{% endblock %}
+
+{% block content %}
+<section class="hero" id="home">
+  <div class="hero-slider" id="heroSlider">
+    {% for slide in slides %}
+    <div
+      class="hero-slide {% if forloop.first %}active{% endif %}"
+      style="--bg:url('{{ slide.image.url }}')"
+    >
+      <div class="slide-overlay"></div>
+      <div class="slide-inner">
+        <span class="slide-tag reveal-anim" style="--d: 0.3s"
+          >{{ slide.tag_en }}</span
+        >
+        <h1 class="slide-heading reveal-anim" style="--d: 0.55s">
+          {{ slide.title }}
+        </h1>
+        <p class="slide-sub reveal-anim" style="--d: 0.75s">
+          {{ slide.subtitle_ar }}
+        </p>
+        <p class="slide-desc reveal-anim" style="--d: 0.95s">
+          {{ slide.description }}
+        </p>
+        <div class="slide-btns reveal-anim" style="--d: 1.15s">
+          <a href="{% url 'explore' %}" class="btn btn-gold">Explore Now</a>
+          <a href="{% url 'book' %}" class="btn btn-ghost">Book a Journey</a>
+        </div>
+      </div>
+      <div class="slide-label">
+        <span>{{ slide.location_en }}</span>
+        <span class="slide-label-ar">{{ slide.location_ar }}</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <button
+    class="hero-arrow prev-arrow"
+    id="heroPrev"
+    aria-label="Previous slide"
+  >
+    <i class="fas fa-chevron-left"></i>
+  </button>
+  <button class="hero-arrow next-arrow" id="heroNext" aria-label="Next slide">
+    <i class="fas fa-chevron-right"></i>
+  </button>
+
+  <div class="hero-dots" id="heroDots"></div>
+
+  <div class="slide-counter">
+    <span id="currentNum">01</span>
+    <span class="counter-sep"></span>
+    <span class="counter-total" id="totalNum"
+      >{{ slides|length|stringformat:"02d" }}</span
+    >
+  </div>
+
+  <div class="hero-progress-wrap">
+    <div class="hero-progress-bar" id="heroProgress"></div>
+  </div>
+
+  <div class="scroll-cue">
+    <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+{# ════ STATS BAND ════ #}
+<section class="stats-band" id="stats">
+  <div class="stats-inner">
+    {% for stat in stats %}
+    <div class="stat-block reveal-up" style="--rd:{{ forloop.counter0 }}00ms">
+      <i class="{{ stat.icon }} stat-ico"></i>
+      <div class="stat-data">
+        <div class="stat-num-wrap">
+          <span class="stat-num" data-target="{{ stat.number }}">0</span>
+          <span class="stat-suf">{{ stat.suffix }}</span>
+        </div>
+        <span class="stat-lbl">{{ stat.label }}</span>
+      </div>
+    </div>
+    {% if not forloop.last %}
+    <div class="stat-sep"></div>
+    {% endif %} {% endfor %}
+  </div>
+</section>
+
+{# ════ DISCOVER — category cards, each → explore?cat= ════ #} 
+{# ════ DISCOVER— category cards, each → explore?cat= ════ #}
+<section class="discover" id="discover">
+  <div class="discover-head">
+    <span class="eyebrow reveal-up">What Awaits</span>
+    <h2 class="sec-title reveal-up" style="--rd: 0.1s">Discover Egypt</h2>
+    <p class="sec-sub reveal-up" style="--rd: 0.2s">
+      اكتشف كل ما تخبئه أرض الحضارة
+    </p>
+  </div>
+
+  <div class="discover-grid discover-grid--{{ categories|length }}">
+    {% for cat in categories %}
+    <a
+      href="{% url 'explore' %}?cat={{ cat.slug }}"
+      class="dcard {% if forloop.first %}dcard-lg{% elif forloop.last %}dcard-wide{% endif %} reveal-up"
+      style="--rd:{{ forloop.counter0 }}00ms"
+      aria-label="{{ cat.name }}"
+    >
+      <div
+        class="dcard-img"
+        style="background-image:url('{{ cat.image.url }}')"
+      ></div>
+      <div class="dcard-gloss"></div>
+      <div class="dcard-body">
+        <i class="{{ cat.icon }} dcard-ico"></i>
+        <div>
+          <span class="dcard-tag">{{ cat.name }}</span>
+          <h3 class="dcard-title">{{ cat.tag_line }}</h3>
+        </div>
+        <span class="dcard-link"
+          >Explore <i class="fas fa-arrow-right"></i
+        ></span>
+      </div>
+    </a>
+    {% empty %}
+    <p class="empty-state">No categories available yet.</p>
+    {% endfor %}
+  </div>
+</section>
+
+{# ════ LANDMARKS CAROUSEL — each card → place_detail ════ #} 
+{# ════ LANDMARKSCAROUSEL — “Gallery” anchor lives here ════ #}
+<section class="landmarks" id="landmarks">
+  <div class="landmarks-head" id="gallery">
+    <div>
+      <span class="eyebrow reveal-up">Must Visit</span>
+      <h2 class="sec-title reveal-up" style="--rd: 0.1s">Iconic Landmarks</h2>
+      <p class="sec-sub reveal-up" style="--rd: 0.2s">
+        أبرز معالم مصر التاريخية
+      </p>
+    </div>
+    <div class="lm-nav reveal-up" style="--rd: 0.2s">
+      <button class="lm-btn" id="lmPrev" aria-label="Previous">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="lm-btn" id="lmNext" aria-label="Next">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="lm-viewport">
+    <div class="lm-track" id="lmTrack">
+      {% for place in landmarks %}
+      <a
+        href="{% if place.slug %}{% url 'place' place.slug %}{% else %}#{% endif %}"
+        class="lm-card reveal-up"
+        style="--rd:{{ forloop.counter0 }}00ms"
+      >
+        <div
+          class="lm-img"
+          style="background-image:url('{{ place.image.url }}')"
+        >
+          <span class="lm-badge">{{ place.badge }}</span>
+          {% if place.rating and place.rating >= 4.8 %}<span class="ai-badge">AI Recommended</span>{% endif %}
+          {% if place.rating or place.price %}
+          <div class="card-hover-meta">
+            {% if place.rating %}<i class="fas fa-star"></i><span>{{ place.rating }}</span>{% endif %}
+            {% if place.price %}<i class="fas fa-tag"></i><span>{{ place.price }}</span>{% endif %}
+          </div>
+          {% endif %}
+        </div>
+        <div class="lm-info">
+          <h4 class="lm-name">{{ place.name }}</h4>
+          <p class="lm-name-ar">{{ place.name_ar }}</p>
+          <div class="lm-meta">
+            <span
+              ><i class="fas fa-location-dot"></i> {{ place.location }}</span
+            >
+            <span class="lm-rating"
+              ><i class="fas fa-star"></i> {{ place.rating }}</span
+            >
+          </div>
+        </div>
+      </a>
+      {% empty %}
+      <p class="empty-state">No landmarks to display.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ════ EXPERIENCE SECTION ════ #} {# ════ EXPERIENCE SECTION ════ #}
+<section class="experience" id="experience">
+  <div class="exp-wrap">
+    <div class="exp-left">
+      <span class="eyebrow reveal-up">Curated Experiences</span>
+      <h2 class="sec-title sec-title-light reveal-up" style="--rd: 0.1s">
+        Plan Your Perfect Journey
+      </h2>
+      <p class="sec-body reveal-up" style="--rd: 0.2s">
+        From sunrise Nile cruises to moonlit desert drives — Egypt reveals
+        herself one wonder at a time.
+      </p>
+      <a
+        href="{% url 'book' %}"
+        class="btn btn-gold reveal-up"
+        style="--rd: 0.3s"
+        >Start Planning</a
+      >
+    </div>
+    <div class="exp-right">
+      {% for exp in experiences %}
+      <div class="exp-card reveal-up" style="--rd:{{ forloop.counter0 }}00ms">
+        <div class="exp-ico"><i class="{{ exp.icon }}"></i></div>
+        <div>
+          <h4>{{ exp.title }}</h4>
+          <p>{{ exp.description }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# ════ QUOTE (optional) ════ #}
+{% if quote %}
+<section class="quote-section">
+  <div class="quote-bg"{% if quote.background_image %} style="background-image:url('{{ quote.background_image.url }}')"{% endif %}></div>
+  <div class="quote-veil"></div>
+  <div class="quote-inner">
+    <div class="quote-ornament">
+      <span></span><i class="fas fa-ankh"></i><span></span>
+    </div>
+    <blockquote class="quote-text reveal-up">"{{ quote.text }}"</blockquote>
+    <cite class="quote-by reveal-up" style="--rd: 0.2s"
+      >— {{ quote.author }}</cite
+    >
+  </div>
+</section>
+{% endif %}
+
+{# ════ CTA BAND ════ #}
+<section class="cta-band">
+  <div class="cta-inner">
+    <div class="reveal-up">
+      <span class="eyebrow" style="color: var(--gold)"
+        >Your Adventure Awaits</span
+      >
+      <h2 class="sec-title sec-title-light">Ready to Discover Egypt?</h2>
+    </div>
+    <div class="cta-actions reveal-up" style="--rd: 0.2s">
+      <a href="{% url 'explore' %}" class="btn btn-gold">Start Exploring</a>
+      <a href="{% url 'book' %}" class="btn btn-outline-light">Book Now</a>
+    </div>
+  </div>
+</section>
+{% endblock content %}

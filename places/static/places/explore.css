@@ -1,0 +1,389 @@
+/* ══════════════════════════════════════════════════════
+   EXPLORE / SEARCH PAGE — places/static/explore.css
+   ══════════════════════════════════════════════════════ */
+
+ 
+/* ─── 1. PAGE HEADER ─── */
+.explore-header {
+  background: var(--navy);
+  padding: 48px 80px 40px;
+  border-bottom: 1px solid rgba(212,175,55,.12);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle radial glow */
+.explore-header::before {
+  content: '';
+  position: absolute;
+  left: -10%; top: -50%;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,175,55,.05) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.eh-inner {
+  max-width: 1380px; margin: 0 auto;
+  position: relative; z-index: 1;
+}
+
+.eh-title-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.eh-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+  font-weight: 700; color: var(--white);
+  line-height: 1.1; margin-bottom: 8px;
+}
+
+.eh-sub {
+  font-family: 'Cinzel', serif;
+  font-size: .7rem; font-weight: 600;
+  letter-spacing: .2em; text-transform: uppercase;
+  color: rgba(255,255,255,.3);
+}
+
+/* ── Inline search bar ── */
+.eh-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.eh-search-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.14);
+  padding: 0 14px;
+  width: 300px;
+  transition: border-color var(--t3), background var(--t3);
+}
+.eh-search-field:focus-within {
+  border-color: rgba(212,175,55,.45);
+  background: rgba(255,255,255,.1);
+}
+
+.eh-search-field i { color: rgba(255,255,255,.35); font-size: .88rem; flex-shrink: 0; }
+
+.eh-search-field input {
+  flex: 1;
+  height: 44px;
+  background: none; border: none; outline: none;
+  font-family: 'Lora', serif; font-size: .92rem;
+  color: var(--white);
+}
+.eh-search-field input::placeholder { color: rgba(255,255,255,.25); }
+
+.eh-clear {
+  color: rgba(255,255,255,.3); font-size: .85rem;
+  transition: color var(--t3); flex-shrink: 0;
+}
+.eh-clear:hover { color: var(--gold); }
+
+.eh-search-btn {
+  height: 44px; padding: 0 24px;
+  background: var(--gold); color: var(--navy);
+  font-family: 'Cinzel', serif; font-size: .7rem; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  border: none; cursor: pointer;
+  transition: all var(--t3);
+}
+.eh-search-btn:hover { background: var(--gold-lt); }
+
+
+/* ─── 2. CATEGORY FILTER TABS ─── */
+.cat-filter {
+  background: var(--white);
+  border-bottom: 1px solid rgba(0,0,0,.08);
+  position: sticky; top: var(--nav-h); z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+}
+
+.cf-inner {
+  max-width: 1380px; margin: 0 auto;
+  padding: 0 80px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.cf-inner::-webkit-scrollbar { display: none; }
+
+.cf-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-width: max-content;
+}
+
+.cf-tab {
+  display: flex; align-items: center; gap: 8px;
+  padding: 16px 22px;
+  font-family: 'Cinzel', serif;
+  font-size: .7rem; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--txt-mute);
+  border-bottom: 2px solid transparent;
+  transition: all var(--t3);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.cf-tab i { font-size: .85rem; }
+
+.cf-tab:hover { color: var(--navy); border-bottom-color: rgba(212,175,55,.3); }
+
+.cf-tab--active {
+  color: var(--navy);
+  border-bottom-color: var(--gold);
+}
+.cf-tab--active i { color: var(--gold); }
+
+
+/* ─── 3. PLACES GRID ─── */
+.places-section {
+  padding: 60px 80px 100px;
+  background: var(--cream);
+}
+
+.ps-inner { max-width: 1380px; margin: 0 auto; }
+
+.places-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 60px;
+}
+
+/* ── Place Card ── */
+.place-card {
+  display: flex; flex-direction: column;
+  background: var(--white);
+  border: 1px solid var(--gold);
+  box-shadow: var(--sh-sm);
+  overflow: hidden;
+  text-decoration: none; color: inherit;
+  transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+}
+.place-card:hover {
+  transform: translateY(-6px) scale(1.05);
+  box-shadow: var(--sh-lg);
+}
+
+/* Image */
+.pc-img-wrap {
+  position: relative;
+  aspect-ratio: 16/10;
+  overflow: hidden;
+}
+
+.pc-img-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(62,39,35,.78) 0%, rgba(62,39,35,.18) 55%, transparent 100%);
+  opacity: 0;
+  transition: opacity .35s var(--ease);
+  pointer-events: none;
+  z-index: 0;
+}
+.place-card:hover .pc-img-wrap::after { opacity: 1; }
+
+.pc-img {
+  position: absolute; inset: 0;
+  background: var(--deep) center/cover no-repeat;
+  transition: transform .6s var(--ease);
+}
+.place-card:hover .pc-img { transform: scale(1.05); }
+
+.pc-img--placeholder {
+  background: linear-gradient(135deg, var(--deep) 0%, var(--mid-blue) 100%);
+}
+
+/* Badge */
+.pc-badge {
+  position: absolute; top: 14px; left: 14px;
+  font-family: 'Cinzel', serif;
+  font-size: .6rem; font-weight: 600;
+  letter-spacing: .15em; text-transform: uppercase;
+  color: var(--navy); background: var(--gold);
+  padding: 5px 12px; z-index: 1;
+}
+
+/* Category chip */
+.pc-cat-chip {
+  position: absolute; bottom: 14px; right: 14px;
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'Cinzel', serif;
+  font-size: .58rem; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--white);
+  background: rgba(62,39,35,.72);
+  backdrop-filter: blur(8px);
+  padding: 5px 10px; z-index: 1;
+}
+.pc-cat-chip i { font-size: .72rem; color: var(--gold); }
+
+/* Info */
+.pc-info {
+  padding: 22px 22px 20px;
+  display: flex; flex-direction: column; gap: 6px;
+  flex: 1;
+}
+
+.pc-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.12rem; font-weight: 700;
+  color: var(--navy); line-height: 1.25;
+}
+
+.pc-name-ar {
+  font-family: 'Noto Serif Arabic', serif;
+  font-size: .8rem; color: var(--txt-mute);
+}
+
+.pc-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 6px;
+  font-family: 'Lora', serif; font-size: .8rem; color: var(--txt-mute);
+}
+
+.pc-loc { display: flex; align-items: center; gap: 6px; }
+.pc-loc i { color: var(--gold); }
+
+.pc-rating {
+  display: flex; align-items: center; gap: 5px;
+  font-family: 'Cinzel', serif; font-size: .75rem;
+  font-weight: 600; color: var(--txt-dark);
+}
+.pc-rating i { color: var(--gold); }
+
+/* Arrow CTA — slides in on hover */
+.pc-cta {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'Cinzel', serif; font-size: .66rem; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0; transform: translateY(6px);
+  transition: all var(--t3);
+  margin-top: auto; padding-top: 10px;
+}
+.pc-cta i { transition: transform var(--t3); }
+.place-card:hover .pc-cta { opacity: 1; transform: translateY(0); }
+.place-card:hover .pc-cta i { transform: translateX(5px); }
+
+
+/* ─── 4. PAGINATION ─── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.pag-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 22px;
+  font-family: 'Cinzel', serif;
+  font-size: .72rem; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--navy);
+  border: 1.5px solid var(--navy);
+  text-decoration: none;
+  transition: all var(--t3);
+}
+.pag-btn:hover { background: var(--navy); color: var(--gold); }
+
+.pag-btn--disabled {
+  opacity: .3; pointer-events: none; cursor: default;
+}
+
+.pag-numbers {
+  display: flex; align-items: center; gap: 6px;
+}
+
+.pag-num {
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: .78rem; font-weight: 600;
+  color: var(--txt-mid);
+  border: 1px solid rgba(0,0,0,.1);
+  text-decoration: none;
+  transition: all var(--t3);
+}
+.pag-num:hover { border-color: var(--gold); color: var(--navy); }
+
+.pag-num--active {
+  background: var(--gold); color: var(--navy);
+  border-color: var(--gold);
+  pointer-events: none;
+}
+
+
+/* ─── 5. EMPTY STATE ─── */
+.explore-empty {
+  text-align: center;
+  padding: 90px 40px;
+  max-width: 500px; margin: 0 auto;
+}
+
+.ee-icon {
+  font-size: 3.5rem; color: rgba(212,175,55,.25);
+  margin-bottom: 24px;
+  animation: slowSpin 8s linear infinite;
+}
+@keyframes slowSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.ee-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem; font-weight: 700;
+  letter-spacing: .1em; color: var(--navy);
+  margin-bottom: 14px;
+}
+
+.ee-sub {
+  font-family: 'Lora', serif;
+  font-size: .96rem; line-height: 1.75;
+  color: var(--txt-mute); margin-bottom: 32px;
+}
+
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1100px) {
+  .explore-header, .places-section { padding-left: 48px; padding-right: 48px; }
+  .cf-inner { padding: 0 48px; }
+}
+
+@media (max-width: 900px) {
+  .eh-title-row { flex-direction: column; align-items: flex-start; }
+  .eh-search { width: 100%; }
+  .eh-search-field { flex: 1; width: auto; }
+  .places-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  .explore-header { padding: 32px 22px 28px; }
+  .places-section { padding: 40px 22px 72px; }
+  .cf-inner { padding: 0 22px; }
+  .places-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+  .pag-btn span { display: none; }
+}
+
+@media (max-width: 520px) {
+  .places-grid { grid-template-columns: 1fr; }
+}
