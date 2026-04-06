@@ -108,10 +108,10 @@
         </div>
       {% endif %}
 
-      {# FIXED: use a safe runtime fallback for the discrption text #}
+      {# FIXED: use a safe runtime fallback for the description text #}
       <div class="papyrus-box">
-        {% if place.discrption %}
-          {{ place.discrption|linebreaks }}
+        {% if place.description %}
+          {{ place.description|linebreaks }}
         {% else %}
           —
         {% endif %}

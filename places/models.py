@@ -4,8 +4,9 @@ from django.utils.text import slugify
 
 class Place(models.Model):
     name = models.CharField(max_length=120,verbose_name="Name")
+    category = models.CharField(choices=[("landmark", "Landmark"), ("restaurant", "Restaurant"), ("hotel", "Hotel")], verbose_name="Category")
     slug = models.SlugField(unique=True,blank=True,null=True)
-    description = models.TextField(verbose_name="Description", db_column="discrption")
+    description = models.TextField(verbose_name="Description", db_column="description")
     active = models.BooleanField(default=True,verbose_name="Availability")
     created_at = models.DateTimeField(auto_now_add=True,verbose_name="Original date")
     updated_at = models.DateTimeField(auto_now=True,verbose_name="Last date")

@@ -7,7 +7,7 @@ from .models import Place
 
 def list_places(request):
     query = (request.GET.get("q") or "").strip()
-
+    place_type = request.GET.get("type")
     qs = (
         Place.objects.filter(active=True)
         .select_related("bookableservice")
@@ -16,7 +16,10 @@ def list_places(request):
     )
     if query:
         qs = qs.filter(Q(name__icontains=query) | Q(description__icontains=query))
-
+    
+    if place_type:
+        qs = qs.filter(category = place_type)
+    
     paginator = Paginator(qs, 9)
     page_obj = paginator.get_page(request.GET.get("page"))
 
